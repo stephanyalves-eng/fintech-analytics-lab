@@ -121,3 +121,8 @@ def test_config_validation():
     cfg["method_mix"]["MX"] = {"credit_card": 0.5, "pix": 0.5}
     with pytest.raises(ValueError):
         generate(cfg)
+
+
+def test_manifest_records_environment(dataset_dir):
+    m =json.loads((dataset_dir / "manifest.json").read_text(encoding="utf-8"))
+    assert {"python", "numpy", "pandas", "pyarrow", "duckdb"} <= set(m["environment"])

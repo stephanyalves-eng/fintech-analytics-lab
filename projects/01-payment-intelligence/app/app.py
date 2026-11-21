@@ -394,7 +394,9 @@ with tabs[4]:
     st.warning(
         "Hypothetical simulation under explicit assumptions on synthetic data. Not a forecast, "
         "not realized uplift, not causal proof. Fees and contribution use a synthetic MDR "
-        "[TO VERIFY]. Runs on the full dataset (sidebar filters do not apply here).",
+        "[TO VERIFY]. Runs on the full dataset (sidebar filters do not apply here). "
+        "Values are point estimates; bootstrap 95% intervals for TPV and contribution are in "
+        "reports/diagnostic_memo.md.",
         icon="⚠️",
     )
     s1_base, s2_base = scenario_bases(DB)

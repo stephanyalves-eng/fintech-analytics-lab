@@ -109,3 +109,54 @@ def test_memo_and_tables_written(con, dataset_dir, tmp_path):
     assert (tmp_path / "diagnostics" / "s2_grid.csv").exists()
     s = tables["d01_failure_taxonomy"].groupby("country")["share_of_attempts"].sum()
     assert s.round(9).eq(1).all()
+
+
+def test_s1_payments_aggregate_to_base(con):
+    base = dg.run(con, "s1_reroute_base")
+    agg = sc.s1_aggregate(dg.run(con, "s1_payments"))
+    keys = [*sc.S1_KEYS, "switched"]
+    m = base.merge(agg, on=keys, suffixes=("", "_agg"), validate="1:1")
+    assert len(m) == len(base) == len(agg)
+    for c in ["payments", *sc.S1_NUM]:
+        assert m[c].astype(float).to_numpy() == pytest.approx(m[f"{c}_agg"].astype(float))
+
+
+def test_s1_bootstrap_deterministic_and_brackets_point(con):
+    pay = dg.run(con, "s1_payments")
+    cp = dg.run(con, "s2_retry_base").set_index("country")["payments"]
+    a = sc.S1Assumptions(min_n=5)
+    b1 = sc.s1_bootstrap(pay, cp, a, n_boot=60, seed=1)
+    b2 = sc.s1_bootstrap(pay, cp, a, n_boot=60, seed=1)
+    pd.testing.assert_frame_equal(b1, b2)
+    point = sc.simulate_s1(sc.s1_aggregate(pay), cp, a).merge(
+        b1, on=["country", "first_acquirer_id"]
+    )
+    assert len(point) > 0
+    for c in sc.S1_BOOT_OUT:
+        assert (point[f"{c}_boot_lo95"] <= point[f"{c}_boot_hi95"]).all()
+        inside = (point[f"{c}_boot_lo95"] - 1e-6 <= point[c]) & (
+            point[c] <= point[f"{c}_boot_hi95"] + 1e-6
+        )
+        assert inside.mean() >= 0.8  # percentile CI need not contain the point every time
+
+
+def test_s1_bootstrap_degenerate_when_no_variation():
+    rows = []
+    for sw, s in ((False, 0), (True, 1)):
+        for _ in range(40):
+            rows.append(
+                {
+                    "country": "BR",
+                    "first_acquirer_id": "A",
+                    "method_code": "credit_card",
+                    "amount_band_brl": "1",
+                    "switched": sw,
+                    "succeeded": s,
+                    "tpv_brl": 100.0 * s,
+                    "processing_cost_brl": 1.0,
+                    "fee_brl": 3.0 * s,
+                }
+            )
+    pay = pd.DataFrame(rows)
+    b = sc.s1_bootstrap(pay, pd.Series({"BR": 1000}), n_boot=20).iloc[0]
+    assert b["d_succeeded_boot_lo95"] == b["d_succeeded_boot_hi95"] == pytest.approx(40.0)

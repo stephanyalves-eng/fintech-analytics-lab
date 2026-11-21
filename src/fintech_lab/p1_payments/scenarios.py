@@ -133,6 +133,59 @@ def s1_sensitivity(base: pd.DataFrame, country_payments: pd.Series) -> pd.DataFr
     return pd.concat(rows, ignore_index=True)
 
 
+S1_NUM = ["succeeded", "tpv_brl", "processing_cost_brl", "fee_brl"]
+S1_BOOT_OUT = ["d_succeeded", "d_tpv_brl", "d_fee_brl", "d_cost_brl", "d_net_contribution_brl"]
+BOOT_SEED = 20261121
+N_BOOT = 500
+
+
+def s1_aggregate(pay: pd.DataFrame) -> pd.DataFrame:
+    """Payment-grain S1 rows (``s1_payments``) -> the ``s1_reroute_base`` layout."""
+    keys = [*S1_KEYS, "switched"]
+    g = pay.groupby(keys, as_index=False, sort=True)
+    out = g[S1_NUM].sum()
+    out.insert(len(keys), "payments", g.size()["size"].to_numpy())
+    return out
+
+
+def s1_bootstrap(
+    pay: pd.DataFrame,
+    country_payments: pd.Series,
+    a: S1Assumptions = S1Assumptions(),
+    n_boot: int = N_BOOT,
+    seed: int = BOOT_SEED,
+) -> pd.DataFrame:
+    """Percentile 95% intervals for every S1 output, per reroute direction.
+
+    Payments are resampled with replacement *within* each stratum x arm, so arm sizes (and
+    therefore stratum eligibility and coverage) stay fixed; success, ticket, cost and fee are
+    resampled jointly. Captures sampling noise of the synthetic sample only, not uncertainty
+    in theta or in the synthetic take rate (those are covered by the sensitivity grids).
+    """
+    keys = [*S1_KEYS, "switched"]
+    p = pay.sort_values(keys, kind="stable").reset_index(drop=True)
+    grp = p.groupby(keys, sort=True).ngroup().to_numpy()
+    sizes = np.bincount(grp)
+    start = np.concatenate([[0], np.cumsum(sizes)[:-1]])
+    labels = p.drop_duplicates(keys)[keys].reset_index(drop=True)
+    vals = {c: p[c].astype(float).to_numpy() for c in S1_NUM}
+    rng = np.random.default_rng(seed)
+    reps = []
+    for b in range(n_boot):
+        idx = start[grp] + np.floor(rng.random(len(p)) * sizes[grp]).astype(np.int64)
+        base = labels.copy()
+        base["payments"] = sizes.astype(float)
+        for c in S1_NUM:
+            base[c] = np.bincount(grp, weights=vals[c][idx], minlength=len(sizes))
+        r = simulate_s1(base, country_payments, a)[["country", "first_acquirer_id", *S1_BOOT_OUT]]
+        reps.append(r.assign(rep=b))
+    allr = pd.concat(reps, ignore_index=True)
+    q = allr.groupby(["country", "first_acquirer_id"])[S1_BOOT_OUT].quantile([0.025, 0.975])
+    q = q.unstack()
+    q.columns = [f"{c}_{'boot_lo95' if lvl == 0.025 else 'boot_hi95'}" for c, lvl in q.columns]
+    return q.reset_index().assign(n_boot=n_boot, boot_seed=seed)
+
+
 @dataclass(frozen=True)
 class S2Assumptions:
     """S2: max attempts per payment = ``cap`` (observed policy = 3).

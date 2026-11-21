@@ -4,7 +4,7 @@ Portfolio of three fintech analytics projects built on **synthetic, explicitly l
 
 | # | Project | Focus | Status |
 |---|---|---|---|
-| 01 | Payment Intelligence & Transaction Optimization | Authorization rate, declines, retries, routing scenarios, advanced SQL | Planned |
+| 01 | [Payment Intelligence & Transaction Optimization](projects/01-payment-intelligence/README.md) | Authorization rate, declines, retries, routing scenarios, advanced SQL | MVP done, audited (CI not yet run) |
 | 02 | Fintech Revenue & TPV Forecasting Engine | TPV/revenue forecasting, backtesting, variance bridge | Planned |
 | 03 | Fintech Experimentation & A/B Testing Lab | Preregistered protocol, SRM, power, guardrails, decision | Planned |
 
@@ -15,7 +15,8 @@ Portfolio of three fintech analytics projects built on **synthetic, explicitly l
 ```powershell
 py -3.12 -m venv .venv
 .\.venv\Scripts\Activate.ps1
-python -m pip install -e ".[dev]"
+python -m pip install -r requirements-lock.txt   # pinned versions used for committed outputs
+python -m pip install -e . --no-deps
 ruff check .
 pytest -q
 ```

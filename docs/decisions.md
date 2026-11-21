@@ -20,4 +20,7 @@
 | 2026-11-21 | P1.5: filtro de adquirente = adquirente da tentativa (grão tentativa) / da 1ª tentativa (grão pagamento) | Um pagamento pode passar por 2 adquirentes; o denominador fica explícito |
 | 2026-11-21 | P1.5: paleta categórica fixa por entidade (validada para CVD) + tabela por gráfico | Contraste < 3:1 em 3 cores; a cor não é o único canal |
 | 2026-11-21 | P1.5: screenshots via Edge headless + CDP (lib `websockets`, já dependência do Streamlit) | Telas reais sem nova dependência; falha se houver exceção |
-
+| 2026-11-21 | Auditoria P1: `build` bloqueado por checks de contrato/reconciliação (`--skip-checks` só para fixtures) | Dados fora do contrato não podem alimentar marts/dashboard em silêncio |
+| 2026-11-21 | Auditoria P1: IC bootstrap (500 reps, estrato × braço, seed fixa) para Δ TPV/contribuição de S1; sinal só quando o IC exclui zero | O IC antigo cobria só Δ aprovados; a conclusão sobre margem não tinha suporte |
+| 2026-11-21 | Auditoria P1: `requirements-lock.txt` + versões no manifest | O hash só é garantido no mesmo ambiente |
+| 2026-11-21 | Auditoria P1: cohorts por mês de ativação, `pre_window` separado; churn não modelado (retenção ≈ 1 rotulada) | Evita censura à esquerda; modelar churn mudaria todos os outputs |

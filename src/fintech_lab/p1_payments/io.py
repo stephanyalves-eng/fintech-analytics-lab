@@ -15,7 +15,7 @@ import pyarrow.parquet as pq
 import yaml
 
 from fintech_lab.p1_payments.generator import GENERATOR_VERSION, TABLES
-from fintech_lab.shared.provenance import DataOrigin
+from fintech_lab.shared.provenance import DataOrigin, environment
 
 MONEY_COLUMNS = {
     "dim_acquirer": ["fee_fixed_local"],
@@ -83,6 +83,8 @@ def write_dataset(
         "seed": cfg["seed"],
         "target_attempts": cfg["target_attempts"],
         "config_sha256": config_hash(cfg),
+        # The content hash is only guaranteed for this environment (see requirements-lock.txt).
+        "environment": environment(),
         "tables": {},
     }
     dataset_h = hashlib.sha256()

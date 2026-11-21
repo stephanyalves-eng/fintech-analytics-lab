@@ -57,3 +57,21 @@ def test_daily_spine_is_dense(con):
     per_country = df.groupby("country")["created_date_local"].nunique()
     span = (df["created_date_local"].max() - df["created_date_local"].min()).days + 1
     assert (per_country == span).all()
+
+
+def test_cohorts_use_activation_and_flag_left_censoring(con):
+    c = con.execute(
+        "SELECT cohort_type, cohort_month, cohort_size, months_since_cohort, merchant_retention "
+        "FROM mart_merchant_cohorts"
+    ).df()
+    assert set(c["cohort_type"]) <= {"activated_in_window", "pre_window"}
+    sizes = c.drop_duplicates(["cohort_type", "cohort_month"])["cohort_size"].sum()
+    assert sizes == con.execute("SELECT COUNT(*) FROM dim_merchant").fetchone()[0]
+    pre = con.execute(
+        "SELECT COUNT(*) FROM dim_merchant WHERE activation_date < "
+        "(SELECT MIN(created_month_local) FROM fct_payment)"
+    ).fetchone()[0]
+    got_pre = c.loc[c["cohort_type"] == "pre_window", "cohort_size"].drop_duplicates().sum()
+    assert got_pre == pre
+    assert (c["months_since_cohort"] >= 0).all()
+    assert c["merchant_retention"].between(0, 1).all()

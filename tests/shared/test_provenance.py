@@ -18,3 +18,13 @@ def test_same_seed_same_draws():
 def test_invalid_seed_rejected(bad):
     with pytest.raises(ValueError):
         make_rng(bad)
+
+
+def test_environment_records_versions():
+    from fintech_lab.shared.provenance import environment
+
+    env = environment()
+    assert env["python"].count(".") == 2
+    for pkg in ("numpy", "pandas", "pyarrow", "duckdb"):
+        assert env[pkg] != "not installed"
+    assert environment(("no-such-package-xyz",))["no-such-package-xyz"] == "not installed"

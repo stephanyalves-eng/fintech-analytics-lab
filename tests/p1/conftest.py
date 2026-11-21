@@ -36,10 +36,16 @@ def con(dataset_dir):
 
 
 @pytest.fixture(scope="session")
-def corrupted(cfg, tmp_path_factory):
+def corrupted_dir(cfg, tmp_path_factory):
     out = tmp_path_factory.mktemp("p1_corrupted")
     tables, extra = make_corrupted(cfg)
     manifest = write_dataset(tables, out, cfg, kind="corrupted", extra=extra)
+    return out, manifest
+
+
+@pytest.fixture(scope="session")
+def corrupted(corrupted_dir):
+    out, manifest = corrupted_dir
     c = connect()
     build(c, out, marts=False)
     yield c, manifest

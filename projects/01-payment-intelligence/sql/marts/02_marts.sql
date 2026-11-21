@@ -61,9 +61,29 @@ FROM fct_payment
 WHERE first_failed_retryable
 GROUP BY ALL;
 
--- mart_merchant_cohorts · grain: cohort month (first local payment month) x months since cohort.
+-- mart_merchant_cohorts · grain: cohort type x cohort month x months since cohort.
+-- Cohort = ACTIVATION month (dim_merchant), not first observed payment month (audit M5).
+-- Merchants activated before the data window are left-censored: they form a separate
+-- 'pre_window' cohort anchored at the first window month and must not be read as new merchants.
+-- cohort_size counts every merchant of the cohort (incl. ones with no payment), so retention
+-- = active merchants / cohort size. NOTE: the generator models no churn, so retention is ~1 by
+-- construction; this mart demonstrates the SQL pattern, not a merchant-retention finding.
 CREATE OR REPLACE TABLE mart_merchant_cohorts AS
-WITH monthly AS (
+WITH win AS (
+    SELECT MIN(created_month_local) AS start_month FROM fct_payment
+),
+m AS (
+    SELECT d.merchant_id,
+           CASE WHEN d.activation_date >= win.start_month THEN 'activated_in_window'
+                ELSE 'pre_window' END                                        AS cohort_type,
+           GREATEST(CAST(date_trunc('month', d.activation_date) AS DATE), win.start_month)
+                                                                             AS cohort_month
+    FROM dim_merchant AS d, win
+),
+sizes AS (
+    SELECT cohort_type, cohort_month, COUNT(*) AS cohort_size FROM m GROUP BY ALL
+),
+monthly AS (
     SELECT merchant_id, created_month_local AS activity_month,
            COUNT(*) AS payments,
            COUNT(*) FILTER (WHERE is_succeeded) AS succeeded_payments,
@@ -71,24 +91,19 @@ WITH monthly AS (
     FROM fct_payment
     GROUP BY ALL
 ),
-cohort AS (
-    SELECT *, MIN(activity_month) OVER (PARTITION BY merchant_id) AS cohort_month
-    FROM monthly
-),
-sizes AS (
-    SELECT cohort_month, COUNT(DISTINCT merchant_id) AS cohort_size FROM cohort GROUP BY 1
-),
-sized AS (
-    SELECT c.*, s.cohort_size,
-           date_diff('month', c.cohort_month, c.activity_month) AS months_since_cohort
-    FROM cohort AS c
-    JOIN sizes AS s USING (cohort_month)
+act AS (
+    SELECT m.cohort_type, m.cohort_month, mo.*,
+           date_diff('month', m.cohort_month, mo.activity_month) AS months_since_cohort
+    FROM monthly AS mo
+    JOIN m USING (merchant_id)
 )
-SELECT cohort_month, months_since_cohort, ANY_VALUE(cohort_size) AS cohort_size,
-       COUNT(DISTINCT merchant_id)                         AS active_merchants,
-       COUNT(DISTINCT merchant_id) / ANY_VALUE(cohort_size) AS merchant_retention,
-       SUM(payments)                                       AS payments,
-       SUM(succeeded_payments) / SUM(payments)             AS m02_payment_success_rate,
-       SUM(tpv_brl)                                        AS m07_tpv_brl
-FROM sized
-GROUP BY cohort_month, months_since_cohort;
+SELECT a.cohort_type, a.cohort_month, a.months_since_cohort,
+       ANY_VALUE(s.cohort_size)                                  AS cohort_size,
+       COUNT(DISTINCT a.merchant_id)                             AS active_merchants,
+       COUNT(DISTINCT a.merchant_id) / ANY_VALUE(s.cohort_size)  AS merchant_retention,
+       SUM(a.payments)                                           AS payments,
+       SUM(a.succeeded_payments) / SUM(a.payments)               AS m02_payment_success_rate,
+       SUM(a.tpv_brl)                                            AS m07_tpv_brl
+FROM act AS a
+JOIN sizes AS s USING (cohort_type, cohort_month)
+GROUP BY a.cohort_type, a.cohort_month, a.months_since_cohort;

@@ -86,6 +86,22 @@ WHERE p.first_category = 'soft' AND p.method_code <> 'pix'
 GROUP BY ALL
 ORDER BY ALL;
 
+-- name: s1_payments
+-- S1 bootstrap input · grain: 1 payment of the S1 population (same filter as s1_reroute_base).
+-- Aggregating these rows by country x first acquirer x method x band x switched reproduces
+-- s1_reroute_base exactly (tested); used to resample payments for intervals on BRL outcomes.
+SELECT p.payment_id, p.country, p.first_acquirer_id, p.method_code, p.amount_band_brl,
+       a2.switched_acquirer                                       AS switched,
+       p.is_succeeded::INTEGER                                    AS succeeded,
+       CASE WHEN p.is_succeeded THEN p.amount_brl ELSE 0 END      AS tpv_brl,
+       p.processing_cost_brl,
+       COALESCE(s.fee * p.rate_to_brl, 0)                         AS fee_brl
+FROM fct_payment AS p
+JOIN fct_attempt AS a2 ON a2.payment_id = p.payment_id AND a2.attempt_no = 2
+LEFT JOIN stg_settlement AS s ON s.payment_id = p.payment_id
+WHERE p.first_category = 'soft' AND p.method_code <> 'pix'
+ORDER BY p.payment_id;
+
 -- name: s2_retry_base
 -- S2 input · grain: country (payments + attempt-3 facts). Everything needed to recompute
 -- outcomes under a retry cap of 2 (inside data support) or 4 (extrapolation).

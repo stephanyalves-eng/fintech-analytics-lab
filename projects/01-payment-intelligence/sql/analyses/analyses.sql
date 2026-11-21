@@ -221,9 +221,10 @@ GROUP BY decile
 ORDER BY decile;
 
 -- name: q12_cohort_retention
--- Merchant cohort retention matrix (cohort = first local payment month), pivoted with
--- conditional aggregation for months 0..6.
-SELECT cohort_month, ANY_VALUE(cohort_size) AS cohort_size,
+-- Merchant cohort retention matrix (cohort = ACTIVATION month; 'pre_window' = merchants active
+-- before the data window, left-censored), pivoted with conditional aggregation for months 0..6.
+-- Retention is ~1 by construction (the generator has no churn): SQL demo, not a finding.
+SELECT cohort_type, cohort_month, ANY_VALUE(cohort_size) AS cohort_size,
        MAX(merchant_retention) FILTER (WHERE months_since_cohort = 0) AS m0,
        MAX(merchant_retention) FILTER (WHERE months_since_cohort = 1) AS m1,
        MAX(merchant_retention) FILTER (WHERE months_since_cohort = 2) AS m2,
@@ -232,8 +233,8 @@ SELECT cohort_month, ANY_VALUE(cohort_size) AS cohort_size,
        MAX(merchant_retention) FILTER (WHERE months_since_cohort = 5) AS m5,
        MAX(merchant_retention) FILTER (WHERE months_since_cohort = 6) AS m6
 FROM mart_merchant_cohorts
-GROUP BY cohort_month
-ORDER BY cohort_month;
+GROUP BY cohort_type, cohort_month
+ORDER BY cohort_type, cohort_month;
 
 -- name: q13_unit_economics
 -- M08, M09 and the ESTIMATED M13/M14 [TO VERIFY: synthetic MDR, not real revenue] per

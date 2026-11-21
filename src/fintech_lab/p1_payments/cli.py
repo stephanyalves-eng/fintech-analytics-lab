@@ -66,12 +66,37 @@ def _corrupt(a: argparse.Namespace) -> int:
     return 0
 
 
+def _report_failures(results: dict[str, int]) -> list[str]:
+    failed = [name for name, n in results.items() if n]
+    for name in failed:
+        print(f"FAIL  {name}  violations={results[name]}", file=sys.stderr)
+    return failed
+
+
 def _build(a: argparse.Namespace) -> int:
-    Path(a.db).parent.mkdir(parents=True, exist_ok=True)
+    """Build the warehouse. Contract checks gate the marts and reconciliation checks gate the
+    result: on any violation the database file is removed and the exit code is 1, so a
+    dashboard can never open on marts built from data that breaks the contract (audit M1)."""
+    db = Path(a.db)
+    db.parent.mkdir(parents=True, exist_ok=True)
+    skip = getattr(a, "skip_checks", False)
     t0 = time.perf_counter()
-    with connect(a.db) as con:
-        build(con, a.data)
-    print(f"built {a.db} from {a.data} in {time.perf_counter() - t0:.1f}s")
+    failed: list[str] = []
+    with connect(db) as con:
+        build(con, a.data, marts=False)
+        if not skip:
+            failed = _report_failures(run_checks(con, "contract"))
+        if not failed:
+            build(con, a.data)
+            if not skip:
+                failed = _report_failures(run_checks(con, "reconciliation"))
+    if failed:
+        for f in (db, db.with_name(db.name + ".wal")):
+            f.unlink(missing_ok=True)
+        print(f"build aborted: {len(failed)} check(s) failed; {db} removed", file=sys.stderr)
+        return 1
+    note = " (checks SKIPPED)" if skip else " (contract + reconciliation checks passed)"
+    print(f"built {db} from {a.data} in {time.perf_counter() - t0:.1f}s{note}")
     return 0
 
 
@@ -142,7 +167,9 @@ def _dashboard(a: argparse.Namespace) -> int:
             )
         )
     if not Path(a.db).exists():
-        _build(argparse.Namespace(data=Path(a.data), db=Path(a.db)))
+        rc = _build(argparse.Namespace(data=Path(a.data), db=Path(a.db), skip_checks=False))
+        if rc:
+            return rc
     tokens = json.loads((REPO_ROOT / "shared" / "design_tokens" / "tokens.json").read_text())
     c = tokens["color"]
     cmd = [
@@ -196,6 +223,11 @@ def main(argv: list[str] | None = None) -> int:
     b = sub.add_parser("build", help="build the DuckDB warehouse")
     b.add_argument("--data", type=Path, default=DEFAULT_DATA)
     b.add_argument("--db", type=Path, default=DEFAULT_DB)
+    b.add_argument(
+        "--skip-checks",
+        action="store_true",
+        help="build even if contract/reconciliation checks fail (DQ fixtures only)",
+    )
     b.set_defaults(func=_build)
 
     k = sub.add_parser("check", help="run contract (+ reconciliation) checks")

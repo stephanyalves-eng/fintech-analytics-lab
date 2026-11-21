@@ -41,13 +41,16 @@ def compute_all(con: duckdb.DuckDBPyConnection) -> dict[str, pd.DataFrame]:
     s1_base = run(con, "s1_reroute_base")
     s2_base = run(con, "s2_retry_base")
     cp = s2_base.set_index("country")["payments"]
+    s1 = sc.simulate_s1(s1_base, cp)
+    boot = sc.s1_bootstrap(run(con, "s1_payments"), cp)
+    s1 = s1.merge(boot, on=["country", "first_acquirer_id"], how="left", validate="1:1")
     return {
         "d01_failure_taxonomy": run(con, "d01_failure_taxonomy"),
         "d02_worst_segments": worst_segments(con),
         "d03_error_rate_by_period": run(con, "d03_error_rate_by_period"),
         "d04_acquirer_mix_adjusted": run_analysis(con, "q04_acquirer_mix_adjusted"),
         "s1_reroute_base": s1_base,
-        "s1_result": sc.simulate_s1(s1_base, cp),
+        "s1_result": s1,
         "s1_sensitivity": sc.s1_sensitivity(s1_base, cp),
         "s2_retry_base": s2_base,
         "s2_grid": sc.s2_grid(s2_base),
@@ -111,6 +114,16 @@ def render_memo(t: dict[str, pd.DataFrame], manifest: dict, generated_on: str) -
         .reset_index()
     )
     s1_pivot.columns = [str(c) for c in s1_pivot.columns]
+    s1 = s1.assign(
+        contrib_ci=[
+            f"{_fmt(lo, 'brl')} a {_fmt(hi, 'brl')}"
+            for lo, hi in zip(
+                s1["d_net_contribution_brl_boot_lo95"],
+                s1["d_net_contribution_brl_boot_hi95"],
+                strict=True,
+            )
+        ]
+    )
     pos = s1[s1["d_succeeded_lo95"] > 0]
     neg = s1[s1["d_succeeded_hi95"] < 0]
     unclear = s1[(s1["d_succeeded_lo95"] <= 0) & (s1["d_succeeded_hi95"] >= 0)]
@@ -281,8 +294,17 @@ def render_memo(t: dict[str, pd.DataFrame], manifest: dict, generated_on: str) -
                 "d_m02_pp": ("Δ M02 do país", "pp"),
                 "d_tpv_brl": ("Δ TPV (BRL)", "brl"),
                 "d_net_contribution_brl": ("Δ contribuição (BRL)", "brl"),
+                "contrib_ci": ("IC95 Δ contribuição (bootstrap)", ""),
             },
         )
+    )
+    a("")
+    n_boot = int(s1["n_boot"].iloc[0]) if len(s1) else 0
+    a(
+        f"IC 95% de Δ pagamentos: aproximação normal da diferença de proporções. IC de Δ TPV e "
+        f"Δ contribuição: bootstrap percentil ({n_boot} reamostragens de pagamentos dentro de "
+        f"cada estrato × braço, seed `{int(s1['boot_seed'].iloc[0]) if len(s1) else '—'}`). "
+        "Cobre só o ruído amostral; θ e take rate são tratados nas grades de sensibilidade."
     )
     a("")
     a(
@@ -294,12 +316,22 @@ def render_memo(t: dict[str, pd.DataFrame], manifest: dict, generated_on: str) -
         "esperado dessas direções tende a ser superestimado."
     )
     a("")
-    trade = s1[(s1["d_succeeded"] > 0) & (s1["d_net_contribution_brl"] < 0)]
+    lo_c, hi_c = s1["d_net_contribution_brl_boot_lo95"], s1["d_net_contribution_brl_boot_hi95"]
+    more = s1["d_succeeded_lo95"] > 0
+    trade = s1[more & (hi_c < 0)]
+    unclear_c = s1[more & (lo_c <= 0) & (hi_c >= 0)]
     if len(trade):
         a(
             f"- Trade-off autorização × custo: em **{names(trade)}** o cenário aprova mais "
-            "pagamentos, mas a contribuição estimada cai, porque o adquirente de destino tem "
-            "tarifa sintética maior. Decidir exige pesar conversão do merchant contra margem."
+            "pagamentos, mas a contribuição cai (IC 95% bootstrap abaixo de zero), porque o "
+            "adquirente de destino tem tarifa sintética maior. Decidir exige pesar conversão "
+            "do merchant contra margem."
+        )
+    if len(unclear_c):
+        a(
+            f"- Em **{names(unclear_c)}** o cenário aprova mais pagamentos, mas o sinal da "
+            "Δ contribuição é **indefinido** (IC 95% bootstrap cruza zero): a amostra não "
+            "sustenta afirmar ganho nem perda de margem."
         )
     a("")
     a("Sensibilidade da Δ contribuição líquida (BRL) a θ, take rate × 1,0 (linear em θ):")

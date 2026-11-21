@@ -69,19 +69,22 @@ A diferença de um segmento mistura risco do portador, ticket, setor e emissor; 
 
 Resultado com θ = 1 (a diferença observada se transfere integralmente):
 
-| País | De | Rerroteados | Cobertura | Δ pagamentos aprovados | IC95 inf. | IC95 sup. | Δ M02 do país | Δ TPV (BRL) | Δ contribuição (BRL) |
-|---|---|---|---|---|---|---|---|---|---|
-| BR | ACQ_BR_A | 5.980 | 100,0% | -435 | -562 | -307 | -0,18 pp | R$ -175.759 | R$ 934 |
-| BR | ACQ_BR_B | 5.061 | 100,0% | +321 | +207 | +435 | +0,13 pp | R$ 89.690 | R$ -1.606 |
-| CL | ACQ_CL_A | 2.739 | 100,0% | -188 | -278 | -97 | -0,25 pp | R$ -87.597 | R$ 330 |
-| CL | ACQ_CL_B | 3.613 | 96,8% | +188 | +89 | +286 | +0,25 pp | R$ 32.059 | R$ -350 |
-| MX | ACQ_MX_A | 4.798 | 100,0% | +255 | +142 | +369 | +0,20 pp | R$ 42.730 | R$ -451 |
-| MX | ACQ_MX_B | 4.164 | 97,4% | -149 | -255 | -43 | -0,12 pp | R$ -18.343 | R$ 547 |
+| País | De | Rerroteados | Cobertura | Δ pagamentos aprovados | IC95 inf. | IC95 sup. | Δ M02 do país | Δ TPV (BRL) | Δ contribuição (BRL) | IC95 Δ contribuição (bootstrap) |
+|---|---|---|---|---|---|---|---|---|---|---|
+| BR | ACQ_BR_A | 5.980 | 100,0% | -435 | -562 | -307 | -0,18 pp | R$ -175.759 | R$ 934 | R$ -627 a R$ 2.430 |
+| BR | ACQ_BR_B | 5.061 | 100,0% | +321 | +207 | +435 | +0,13 pp | R$ 89.690 | R$ -1.606 | R$ -2.901 a R$ -345 |
+| CL | ACQ_CL_A | 2.739 | 100,0% | -188 | -278 | -97 | -0,25 pp | R$ -87.597 | R$ 330 | R$ -809 a R$ 1.780 |
+| CL | ACQ_CL_B | 3.613 | 96,8% | +188 | +89 | +286 | +0,25 pp | R$ 32.059 | R$ -350 | R$ -626 a R$ -79 |
+| MX | ACQ_MX_A | 4.798 | 100,0% | +255 | +142 | +369 | +0,20 pp | R$ 42.730 | R$ -451 | R$ -1.725 a R$ 895 |
+| MX | ACQ_MX_B | 4.164 | 97,4% | -149 | -255 | -43 | -0,12 pp | R$ -18.343 | R$ 547 | R$ 242 a R$ 853 |
+
+IC 95% de Δ pagamentos: aproximação normal da diferença de proporções. IC de Δ TPV e Δ contribuição: bootstrap percentil (500 reamostragens de pagamentos dentro de cada estrato × braço, seed `20261121`). Cobre só o ruído amostral; θ e take rate são tratados nas grades de sensibilidade.
 
 - IC 95% de Δ acima de zero: **ACQ_BR_B, ACQ_CL_B, ACQ_MX_A**. Abaixo de zero: **ACQ_BR_A, ACQ_CL_A, ACQ_MX_B**. Indefinido (IC cruza zero): **nenhum**.
 - Escolher só as direções com estimativa positiva introduz *winner's curse*: o ganho esperado dessas direções tende a ser superestimado.
 
-- Trade-off autorização × custo: em **ACQ_BR_B, ACQ_CL_B, ACQ_MX_A** o cenário aprova mais pagamentos, mas a contribuição estimada cai, porque o adquirente de destino tem tarifa sintética maior. Decidir exige pesar conversão do merchant contra margem.
+- Trade-off autorização × custo: em **ACQ_BR_B, ACQ_CL_B** o cenário aprova mais pagamentos, mas a contribuição cai (IC 95% bootstrap abaixo de zero), porque o adquirente de destino tem tarifa sintética maior. Decidir exige pesar conversão do merchant contra margem.
+- Em **ACQ_MX_A** o cenário aprova mais pagamentos, mas o sinal da Δ contribuição é **indefinido** (IC 95% bootstrap cruza zero): a amostra não sustenta afirmar ganho nem perda de margem.
 
 Sensibilidade da Δ contribuição líquida (BRL) a θ, take rate × 1,0 (linear em θ):
 

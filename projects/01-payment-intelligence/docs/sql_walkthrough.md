@@ -17,7 +17,7 @@ python -m fintech_lab.p1_payments.cli explain    # EXPLAIN ANALYZE -> reports/qu
 | | | `mart_acquirer_performance` | mês × adquirente × método × faixa de valor |
 | | | `mart_decline_reasons` | mês × país × método × código |
 | | | `mart_retry_recovery` | país × método × categoria da 1ª falha × 1º adquirente |
-| | | `mart_merchant_cohorts` | mês de cohort × meses desde o cohort |
+| | | `mart_merchant_cohorts` | tipo de cohort × mês de ativação × meses desde o cohort |
 | Checks | `sql/checks/contract.sql`, `reconciliation.sql` | blocos `-- name:` que retornam linhas violadoras | — |
 | Análises | `sql/analyses/analyses.sql` | q01–q15 | por query |
 
@@ -58,7 +58,7 @@ Decisões que valem discutir em entrevista:
 | q09 | M10 no pico (19–22h local) × fora do pico, por adquirente | agregação condicional |
 | q10 | Latência p50/p95 por adquirente × resultado | quantile_cont |
 | q11 | Concentração de TPV por decil de merchant (Pareto) | NTILE, soma acumulada |
-| q12 | Matriz de retenção de cohorts (meses 0–6) | pivot com FILTER |
+| q12 | Matriz de retenção de cohorts por mês de **ativação** (meses 0–6); `pre_window` = merchants já ativos antes da janela (censura à esquerda). Retenção ≈ 1 por construção (o gerador não tem churn): demonstra o SQL, não é achado | pivot com FILTER |
 | q13 | M08, M09 e M13/M14 estimados `[TO VERIFY]` | join 1:1 no grão de pagamento |
 | q14 | Dias anômalos de M02 (\|z\| ≥ 3 contra a janela anterior de 28 dias) | janela ROWS, STDDEV_SAMP |
 | q15 | Demonstração de double counting: TPV via join × TPV correto | CTEs |

@@ -12,6 +12,14 @@ jobs:
         with:
           python-version: "3.12"
           cache: pip
-      - run: python -m pip install -e ".[dev]"
+          cache-dependency-path: requirements-lock.txt
+      # Pinned environment that produced the committed outputs (audit M3/M4).
+      - run: python -m pip install -r requirements-lock.txt
+      - run: python -m pip install -e . --no-deps
       - run: ruff check .
       - run: pytest -q
+      # P1 smoke: default dataset must pass every contract + reconciliation check, and the
+      # content hash is printed so it can be compared with the manifest committed locally.
+      - run: python -m fintech_lab.p1_payments.cli generate
+      - run: python -m fintech_lab.p1_payments.cli check
+      - run: python -m fintech_lab.p1_payments.cli build
