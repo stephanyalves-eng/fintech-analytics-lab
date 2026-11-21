@@ -24,3 +24,7 @@
 | 2026-11-21 | Auditoria P1: IC bootstrap (500 reps, estrato × braço, seed fixa) para Δ TPV/contribuição de S1; sinal só quando o IC exclui zero | O IC antigo cobria só Δ aprovados; a conclusão sobre margem não tinha suporte |
 | 2026-11-21 | Auditoria P1: `requirements-lock.txt` + versões no manifest | O hash só é garantido no mesmo ambiente |
 | 2026-11-21 | Auditoria P1: cohorts por mês de ativação, `pre_window` separado; churn não modelado (retenção ≈ 1 rotulada) | Evita censura à esquerda; modelar churn mudaria todos os outputs |
+| 2026-11-21 | P3.1: experimento = 3DS baseado em risco (B) vs. 3DS obrigatório (A), unidade usuário, hash SHA-256 com salt, 50/50 | Trade-off real entre conversão e fraude; métrica primária no grão usuário evita clusters |
+| 2026-11-21 | P3.1: n = máximo entre primária e guardrails de proporção (poder ≥ 0,80 em cada) | Com o n da primária (9.335), o G1 teria poder ≈ 0,40 e o Launch seria quase sempre inconclusivo |
+| 2026-11-21 | P3.1: guardrails via interseção-união (todos precisam passar), sem Holm | A IUT controla α sem ajuste; Holm (proposto no plano) seria desnecessariamente conservador |
+| 2026-11-21 | P3.1: lock por SHA-256 de texto normalizado em LF; mudança só via `--amend` registrado | Checkout CRLF no Windows não quebra o hash; emendas ficam auditáveis |

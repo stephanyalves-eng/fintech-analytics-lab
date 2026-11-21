@@ -1,0 +1,10 @@
+{
+  "locked_at": "2026-11-21T20:56:55Z",
+  "algorithm": "sha256-lf",
+  "files": {
+    "configs/protocol.yaml": "3e19e7cfff85bf54eceb29dbbb8acf115f07adab217686a820d9e01d8c93ec34",
+    "docs/protocol.md": "27e1c638441dc7f5bc49935c210e08de15d9a4d51549b179a9969cf1fc181093",
+    "reports/sample_size.csv": "0cd8ee83fb7bc267055e554533c065a919f99a5d70bd4507dafacba15249da5d"
+  },
+  "amendments": []
+}

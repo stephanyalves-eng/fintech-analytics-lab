@@ -1,0 +1,14 @@
+# data_origin=derived (from synthetic assumptions in protocol.yaml)
+metric_id,metric,test,baseline,effect_or_margin,users_per_arm_required,power_at_plan
+P01,user_conversion_7d,two-sided superiority,0.6,0.02,9335,0.9957
+G1,chargeback_rate,one-sided non-inferiority,0.004,0.002,25016,0.8
+G2,technical_failure_rate,one-sided non-inferiority,0.02,0.005,10549,0.9907
+G5,checkout_abandonment,one-sided non-inferiority,0.25,0.02,8830,0.9971
+# joint_power_approx=0.7869
+# binding_metric=G1
+# users_per_arm_required=25016
+# users_per_arm_planned=26333
+# users_total_planned=52666
+# mde_abs_at_plan=0.01224
+# enrollment_days=28
+# analysis_day=65

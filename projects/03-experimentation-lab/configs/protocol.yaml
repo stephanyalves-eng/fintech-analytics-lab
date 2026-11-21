@@ -1,0 +1,144 @@
+# P3.1 preregistered protocol — machine-readable parameters.
+# Read by the analysis pipeline (P3.3+). Locked by `cli lock` (SHA-256 in protocol.lock.json).
+# Any change after locking requires `cli lock --amend "<reason>"` (logged amendment).
+# All baselines/traffic below are SYNTHETIC ASSUMPTIONS, not observed values.
+
+experiment:
+  id: P3-EXP-001
+  name: risk_based_3ds
+  protocol_version: "1.0.0"
+  data_origin: synthetic
+  question: >-
+    Does risk-based 3DS authentication (B) increase user-level checkout conversion
+    versus mandatory 3DS (A), without degrading fraud, failures, latency, cost or abandonment?
+  arms:
+    A: mandatory 3DS on every card payment (current flow, control)
+    B: risk-based 3DS (frictionless for low-risk, challenge for high-risk)
+
+assignment:
+  unit: user_id
+  allocation: {A: 0.5, B: 0.5}
+  method: sha256_bucket          # bucket = int(sha256(salt + ":" + user_id)[:15], 16) % 10000
+  buckets: 10000
+  arm_A_buckets: [0, 4999]       # inclusive range
+  arm_B_buckets: [5000, 9999]
+  salt: p3-exp-001-v1            # fixed per experiment; never reused
+  sticky: true                   # a user keeps its arm for the whole experiment
+
+eligibility:
+  country: BR
+  payment_methods: [credit_card, debit_card]   # Pix has no 3DS step
+  include: first card checkout_start inside the enrollment window
+  exclude:
+    - internal or test accounts
+    - users blocked by pre-checkout fraud rules (pre-treatment, applied equally to A and B)
+
+exposure:
+  trigger: checkout_start          # recorded BEFORE the 3DS step, identically in A and B
+  rule: first eligible checkout_start in the enrollment window; later sessions keep the arm
+  analysis_population: exposed     # ITT among triggered users (assignment as randomized)
+
+windows_days:
+  enrollment: 14                   # minimum; extended in whole weeks if traffic is short
+  conversion: 7                    # after the user's first exposure
+  chargeback_maturation: 30        # after each approved payment
+  # analysis date = enrollment_end + conversion + chargeback_maturation
+
+primary:
+  id: P01
+  name: user_conversion_7d
+  grain: user
+  numerator: exposed users with >= 1 approved payment within 7 days of first exposure
+  denominator: exposed users
+  estimand: p_B - p_A (absolute), also reported as relative (p_B / p_A - 1)
+  hypothesis: {h0: "p_B - p_A = 0", h1: "p_B - p_A != 0", sides: two-sided}
+  test: two_proportion_z           # p-value with pooled SE; 95% CI with unpooled (Wald) SE
+  alpha: 0.05
+  power: 0.80
+  baseline_assumption: 0.60
+  mde_abs: 0.02
+  missing_buffer: 0.05             # inflate n for exposed users with incomplete event trails
+
+guardrails:
+  # Non-inferiority: degradation d = B - A (or B/A - 1 for relative). Higher = worse.
+  # pass         : one-sided 97.5% upper bound of d <= margin
+  # fail (harm)  : two-sided 95% lower bound of d  > margin
+  # undetermined : otherwise
+  alpha_one_sided: 0.025
+  power_target: 0.80
+  design_effect_assumption: 1.2    # repeated payments/attempts per user (clustering); verify in P3.3
+  items:
+    - id: G1
+      name: chargeback_rate
+      grain: approved_payment
+      numerator: approved payments with a simulated chargeback within 30 days
+      denominator: approved payments of exposed users in the conversion window
+      kind: proportion
+      baseline_assumption: 0.004
+      margin_abs: 0.002
+      units_per_user_assumption: 0.75   # 0.60 conversion x 1.25 approved payments per converter
+      inference: cluster-robust by user (delta method)
+    - id: G2
+      name: technical_failure_rate
+      grain: attempt
+      numerator: attempts ending in a technical error
+      denominator: attempts of exposed users in the conversion window
+      kind: proportion
+      baseline_assumption: 0.02
+      margin_abs: 0.005
+      units_per_user_assumption: 1.4
+      inference: cluster-robust by user (delta method)
+    - id: G3
+      name: auth_latency_p95_ms
+      grain: attempt
+      numerator: p95 of checkout_start -> authorization decision latency (ms)
+      denominator: attempts of exposed users
+      kind: quantile
+      margin_abs: 300
+      inference: user-level cluster bootstrap (2000 reps, fixed seed)
+    - id: G4
+      name: cost_per_approved_payment_brl
+      grain: approved_payment
+      numerator: total simulated processing + 3DS cost (BRL)
+      denominator: approved payments
+      kind: ratio
+      margin_rel: 0.02
+      inference: delta method, cluster by user
+    - id: G5
+      name: checkout_abandonment
+      grain: user
+      numerator: exposed users with no payment attempt within 7 days
+      denominator: exposed users
+      kind: proportion
+      baseline_assumption: 0.25
+      margin_abs: 0.02
+      units_per_user_assumption: 1.0
+      inference: two-proportion (user grain, no clustering)
+
+traffic:
+  daily_new_eligible_users_assumption: 2000
+
+validity_gates:   # checked BEFORE any effect estimate; failure => result INVALID
+  srm: {test: chi_square_goodness_of_fit, p_threshold: 0.001}
+  max_missing_share_per_arm: 0.02
+  max_missing_share_diff: 0.005
+  forbid_units_in_both_arms: true
+  forbid_events_before_exposure: true
+
+stopping:
+  type: fixed_horizon
+  interim_efficacy_looks: 0        # no peeking; no early stop for success
+  safety_stop:
+    metric: G2
+    rule: daily, B rate > 2 x A rate with >= 500 attempts per arm
+    action: stop and report as SAFETY_STOP (no effect inference)
+
+decision:
+  order: [validity_gates, do_not_launch, launch, inconclusive]
+  invalid: any validity gate fails
+  do_not_launch: any guardrail is fail, or primary 95% CI upper bound < 0
+  launch: primary 95% CI lower bound > 0 and every guardrail is pass
+  inconclusive: otherwise (non-significance is not evidence of no effect)
+
+exploratory:   # reported, never used for the decision
+  segments: [card_type, new_vs_returning_user, ticket_band]
