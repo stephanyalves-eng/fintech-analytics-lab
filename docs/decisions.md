@@ -15,3 +15,9 @@
 | 2026-11-21 | P1.2: risco por pagamento é latente (não exportado) | Confundidor oculto realista; evita "vazar" a resposta |
 | 2026-11-21 | P1.2: dinheiro em Parquet como decimal(18,2), FX decimal(18,8) | Somas exatas nos checks de reconciliação |
 | 2026-11-21 | P1.3: checks e análises como blocos `-- name:` em arquivos SQL | SQL legível/versionado; o runner Python só conta linhas violadoras |
+| 2026-11-21 | P1.4: S1 como mistura θ (sucesso **e** custo); θ = 0 é o cenário nulo | Evita mudar custo sem mudar comportamento; sensibilidade coerente |
+| 2026-11-21 | P1.4: S2 cap 4 rotulado como extrapolação (propensão observada 2→3 × M01 da 3ª × δ) | A 4ª tentativa nunca foi observada |
+| 2026-11-21 | P1.5: filtro de adquirente = adquirente da tentativa (grão tentativa) / da 1ª tentativa (grão pagamento) | Um pagamento pode passar por 2 adquirentes; o denominador fica explícito |
+| 2026-11-21 | P1.5: paleta categórica fixa por entidade (validada para CVD) + tabela por gráfico | Contraste < 3:1 em 3 cores; a cor não é o único canal |
+| 2026-11-21 | P1.5: screenshots via Edge headless + CDP (lib `websockets`, já dependência do Streamlit) | Telas reais sem nova dependência; falha se houver exceção |
+

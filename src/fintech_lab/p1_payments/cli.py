@@ -8,6 +8,8 @@ Examples (from the repo root, venv active)::
     python -m fintech_lab.p1_payments.cli build                         # DuckDB marts
     python -m fintech_lab.p1_payments.cli check                         # contract + reconciliation
     python -m fintech_lab.p1_payments.cli explain                       # EXPLAIN ANALYZE report
+    python -m fintech_lab.p1_payments.cli diagnose                      # P1.4 memo + tables
+    python -m fintech_lab.p1_payments.cli dashboard                     # P1.5 Streamlit app
 """
 
 from __future__ import annotations
@@ -117,6 +119,63 @@ def _explain(a: argparse.Namespace) -> int:
     return 0
 
 
+def _diagnose(a: argparse.Namespace) -> int:
+    from fintech_lab.p1_payments.diagnostics import write_reports
+
+    t0 = time.perf_counter()
+    with duckdb.connect(str(a.db), read_only=True) as con:
+        tables = write_reports(con, a.data, a.out)
+    print(
+        f"wrote {len(tables)} tables + diagnostic_memo.md to {a.out} "
+        f"in {time.perf_counter() - t0:.1f}s"
+    )
+    return 0
+
+
+def _dashboard(a: argparse.Namespace) -> int:
+    import subprocess
+
+    if not (Path(a.data) / "manifest.json").exists():
+        _generate(
+            argparse.Namespace(
+                config=None, out=Path(a.data), seed=None, attempts=None, merchants=None
+            )
+        )
+    if not Path(a.db).exists():
+        _build(argparse.Namespace(data=Path(a.data), db=Path(a.db)))
+    tokens = json.loads((REPO_ROOT / "shared" / "design_tokens" / "tokens.json").read_text())
+    c = tokens["color"]
+    cmd = [
+        sys.executable,
+        "-m",
+        "streamlit",
+        "run",
+        str(P1_ROOT / "app" / "app.py"),
+        "--server.port",
+        str(a.port),
+        "--server.headless",
+        "true",
+        "--browser.gatherUsageStats",
+        "false",
+        "--theme.base",
+        "light",
+        "--theme.primaryColor",
+        c["primary"],
+        "--theme.backgroundColor",
+        c["bg"],
+        "--theme.secondaryBackgroundColor",
+        c["surface"],
+        "--theme.textColor",
+        c["text"],
+    ]
+    env = {
+        **os.environ,
+        "P1_DB_PATH": str(Path(a.db).resolve()),
+        "P1_DATA_DIR": str(Path(a.data).resolve()),
+    }
+    return subprocess.call(cmd, env=env)
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="p1", description="P1 synthetic payments toolkit")
     sub = p.add_subparsers(dest="cmd", required=True)
@@ -148,6 +207,18 @@ def main(argv: list[str] | None = None) -> int:
     e.add_argument("--db", type=Path, default=DEFAULT_DB)
     e.add_argument("--out", type=Path, default=P1_ROOT / "reports" / "query_plans")
     e.set_defaults(func=_explain)
+
+    d = sub.add_parser("diagnose", help="P1.4 diagnostic tables, scenarios and memo")
+    d.add_argument("--db", type=Path, default=DEFAULT_DB)
+    d.add_argument("--data", type=Path, default=DEFAULT_DATA)
+    d.add_argument("--out", type=Path, default=P1_ROOT / "reports")
+    d.set_defaults(func=_diagnose)
+
+    s = sub.add_parser("dashboard", help="P1.5 Streamlit dashboard (generates/builds if missing)")
+    s.add_argument("--db", type=Path, default=DEFAULT_DB)
+    s.add_argument("--data", type=Path, default=DEFAULT_DATA)
+    s.add_argument("--port", type=int, default=8501)
+    s.set_defaults(func=_dashboard)
 
     args = p.parse_args(argv)
     return args.func(args)

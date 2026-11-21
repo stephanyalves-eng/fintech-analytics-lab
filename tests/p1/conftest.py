@@ -44,3 +44,13 @@ def corrupted(cfg, tmp_path_factory):
     build(c, out, marts=False)
     yield c, manifest
     c.close()
+
+
+@pytest.fixture(scope="session")
+def db_file(dataset_dir, tmp_path_factory):
+    """On-disk warehouse for the dashboard (the app opens it read-only)."""
+    path = tmp_path_factory.mktemp("p1_db") / "p1.duckdb"
+    c = connect(path)
+    build(c, dataset_dir)
+    c.close()
+    return path
