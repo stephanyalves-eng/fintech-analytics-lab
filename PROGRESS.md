@@ -7,12 +7,12 @@
 | M2 P1 dashboard | concluído (P1.4–P1.5) | pytest 59 passed; ruff ok; 7 screenshots reais; 2M tentativas: consultas ≤ 62 ms |
 | M3 P2 dados e modelos | pendente | |
 | M4 P2 dashboard | pendente | |
-| M5 P3 protocolo e simulação | em andamento (P3.1 concluído) | pytest 81 passed; ruff ok; `cli verify` PASS |
-| M6 P3 análise e dashboard | pendente | |
+| M5 P3 protocolo e simulação | concluído (P3.1–P3.2) | ver log P3.2 |
+| M6 P3 análise e dashboard | concluído (P3.3–P3.5) | ver log P3.3–P3.5 |
 | M7 auditoria/publicação | pendente | |
 
 ## Próximo passo
-P2.1 (desenho do forecasting) ou P3.2 (simulador de eventos). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
+P2.1 (desenho do forecasting) ou auditoria independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
 
 ## Log
 - 2026-11-21 M0: estrutura do monorepo, pyproject, ruff, pytest e CI criados.
@@ -24,3 +24,7 @@ P2.1 (desenho do forecasting) ou P3.2 (simulador de eventos). Pendências do P1:
 - 2026-11-21 Auditoria P1: ruff ok; pytest 59 passed; hash determinístico; check 18/18 (corrompido: 16 FAIL); memo/CSVs refeitos idênticos; S1 recalculado de forma independente (6/6). Achados: H1 README do P1 ausente; M1 build não bloqueia contrato; M2 contribuição S1 sem IC; M3 sem lock; M4 CI nunca rodou; M5 cohorts degenerados. Nenhuma correção aplicada (aguarda aprovação).
 - 2026-11-21 Remediação P1 (H1, M1–M5): README do P1; build bloqueado por checks; IC bootstrap em S1 (ACQ_MX_A: sinal da contribuição agora indefinido); lock + versões no manifest (venv novo reproduz o hash); cohorts por ativação. ruff ok; pytest 69 passed; check 18/18; screenshots recapturados. CI segue sem rodar (sem remote).
 - 2026-11-21 P3.1: protocolo pré-registrado P3-EXP-001 (3DS por risco vs. obrigatório): `docs/protocol.md` + `configs/protocol.yaml`; `power.py` (Cohen h; NI para guardrails com design effect 1,2) gera `reports/sample_size.csv`. G1 chargeback define o n: 26.333 usuários/braço, 28 dias, análise no dia 65; poder conjunto ≈ 0,79 (aprox.). Lock SHA-256 (LF) em `configs/protocol.lock.json`; `verify_lock()` obrigatório no P3.3. G3/G4 sem poder pré-experimento [TO VERIFY] (Monte Carlo no P3.3). Nenhum dado gerado.
+- 2026-11-21 P3.2: simulador determinístico (`simulator.py`, `assignment.py`) com efeito verdadeiro em `configs/simulation.yaml`, separado da análise (teste AST). 5 cenários (null/positive/negative/srm/missing), eventos em Parquet + manifest + `truth.json`.
+- 2026-11-21 P3.3: `analysis.py` (lock → portões → P01 → G1–G5 → sensibilidade); G1/G2/G4 com variância por usuário, G3 bootstrap. `montecarlo.py`: tipo I de P01 0,043; guardrails na margem 0,027/0,0185/0,031 (limítrofe, ver `docs/methods.md`). G3/G4 [TO VERIFY].
+- 2026-11-21 P3.4: `decision.py` (regra travada), `economics.py` (hipotética), memos por cenário. Resultado: null INCONCLUSIVE, positive LAUNCH, negative DO NOT LAUNCH, srm e missing INVALID.
+- 2026-11-21 P3.5: dashboard Streamlit (7 abas, 5 cenários), AppTest e 8 screenshots reais. Teclado e leitor de tela [TO VERIFY].

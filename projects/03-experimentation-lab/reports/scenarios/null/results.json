@@ -1,0 +1,203 @@
+{
+  "meta": {
+    "scenario": "null",
+    "seed": 3101,
+    "data_origin": "synthetic",
+    "experiment_id": "P3-EXP-001",
+    "protocol_version": "1.0.0",
+    "lock_algorithm": "sha256-lf",
+    "locked_at": "2026-11-21T20:56:55Z",
+    "amendments": 0,
+    "window_days": {
+      "conversion": 7,
+      "chargeback": 30
+    },
+    "events": 184330
+  },
+  "counts": {
+    "candidates": 54300,
+    "eligible": 52724,
+    "exposed_a": 26560,
+    "exposed_b": 26164,
+    "attempted": 39454,
+    "converted": 32021
+  },
+  "funnel": {
+    "A": {
+      "exposed": 26560,
+      "attempted": 19915,
+      "approved": 16172
+    },
+    "B": {
+      "exposed": 26164,
+      "attempted": 19539,
+      "approved": 15849
+    }
+  },
+  "gates": {
+    "srm": {
+      "n_a": 26560,
+      "n_b": 26164,
+      "p_value": 0.08459770111345573,
+      "threshold": 0.001,
+      "pass": true
+    },
+    "assignment_integrity": {
+      "duplicate_users": 0,
+      "arm_mismatch_vs_hash": 0,
+      "pass": true
+    },
+    "events_before_exposure": {
+      "count": 0,
+      "pass": true
+    },
+    "missing_events": {
+      "share_a": 0.0,
+      "share_b": 0.0,
+      "diff": 0.0,
+      "pass": true
+    },
+    "all_pass": true
+  },
+  "primary": {
+    "p_a": 0.6088855421686747,
+    "p_b": 0.6057560006115272,
+    "diff": -0.0031295415571475083,
+    "se": 0.004253693265595388,
+    "ci_low": -0.01146662715899504,
+    "ci_high": 0.005207544044700023,
+    "z": -0.735727378744026,
+    "p_value": 0.46189662421148536,
+    "rel": -0.005139786282329806,
+    "rel_ci_low": -0.01870400813539963,
+    "rel_ci_high": 0.008611930593653172,
+    "id": "P01",
+    "name": "user_conversion_7d",
+    "n_a": 26560,
+    "n_b": 26164,
+    "x_a": 16172,
+    "x_b": 15849,
+    "alpha": 0.05,
+    "mde_abs_at_observed_n": 0.011918690072570515
+  },
+  "guardrails": [
+    {
+      "id": "G1",
+      "name": "chargeback_rate",
+      "est_a": 0.004328468958694039,
+      "est_b": 0.004353586977096347,
+      "diff": 2.5118018402307644e-05,
+      "ci_low": -0.0014151684316299172,
+      "ci_high": 0.0014654044684345325,
+      "margin": 0.002,
+      "relative": false,
+      "design_effect": 1.0000379369682388,
+      "units_a": 16172.0,
+      "units_b": 15849.0,
+      "status": "pass"
+    },
+    {
+      "id": "G2",
+      "name": "technical_failure_rate",
+      "est_a": 0.019660071029934043,
+      "est_b": 0.019722583441699176,
+      "diff": 6.251241176513309e-05,
+      "ci_low": -0.0024554887490504875,
+      "ci_high": 0.0025805135725807536,
+      "margin": 0.005,
+      "relative": false,
+      "design_effect": 0.9985868797346025,
+      "units_a": 23652.0,
+      "units_b": 23070.0,
+      "status": "pass"
+    },
+    {
+      "id": "G3",
+      "name": "auth_latency_p95_ms",
+      "est_a": 4119.0,
+      "est_b": 4125.0,
+      "diff": 6.0,
+      "ci_low": -70.07499999999999,
+      "ci_high": 84.02499999999986,
+      "margin": 300,
+      "relative": false,
+      "design_effect": null,
+      "units_a": 23652.0,
+      "units_b": 23070.0,
+      "status": "pass"
+    },
+    {
+      "id": "G4",
+      "name": "cost_per_approved_payment_brl",
+      "est_a": 3.814006604006926,
+      "est_b": 3.7607282730771656,
+      "diff": -0.013969123932241478,
+      "ci_low": -0.03634011163231321,
+      "ci_high": 0.008921197504470957,
+      "margin": 0.02,
+      "relative": true,
+      "design_effect": null,
+      "units_a": 16172.0,
+      "units_b": 15849.0,
+      "status": "pass"
+    },
+    {
+      "id": "G5",
+      "name": "checkout_abandonment",
+      "est_a": 0.25018825301204817,
+      "est_b": 0.2532105182693778,
+      "diff": 0.003022265257329626,
+      "ci_low": -0.004386897844359721,
+      "ci_high": 0.010431428359018974,
+      "margin": 0.02,
+      "relative": false,
+      "design_effect": 1.0,
+      "units_a": 26560.0,
+      "units_b": 26164.0,
+      "status": "pass"
+    }
+  ],
+  "sensitivity": {
+    "exclude_incomplete_trails": {
+      "diff": -0.0031295415571475083,
+      "ci_low": -0.01146662715899504,
+      "ci_high": 0.005207544044700023,
+      "p_value": 0.46189662421148536,
+      "n_a": 26560,
+      "n_b": 26164
+    },
+    "robust_hc1": {
+      "diff": -0.003129541557147548,
+      "ci_low": -0.011466785290448193,
+      "ci_high": 0.005207702176153097,
+      "p_value": 0.46190755649746307
+    },
+    "incomplete_users": 0
+  },
+  "multiplicity_policy": "single primary; guardrails by intersection-union (all must pass); segments exploratory and excluded from the decision",
+  "decision": {
+    "decision": "INCONCLUSIVE",
+    "rule": "section 8, step 4",
+    "reasons": [
+      "P01 95% CI [-0.0115, +0.0052] includes 0; non-significance is not evidence of no effect"
+    ]
+  },
+  "economics": {
+    "label": "HYPOTHETICAL - assumed take rate and fees [TO VERIFY]",
+    "value_per_user_a": -0.7649702070783134,
+    "value_per_user_b": -0.6883046724506956,
+    "diff_per_user": 0.07666553462761783,
+    "ci_low_per_user": -0.19543642289071805,
+    "ci_high_per_user": 0.3487674921459537,
+    "annual_users": 730000,
+    "annual_delta": 55965.84027816101,
+    "annual_ci_low": -142668.58871022417,
+    "annual_ci_high": 254600.2692665462,
+    "implementation_cost": 150000,
+    "year1_net": -94034.15972183898,
+    "year1_net_ci_low": -292668.58871022414,
+    "year1_net_ci_high": 104600.26926654621,
+    "breakeven_diff_per_user": 0.2054794520547945,
+    "ci_excludes_breakeven": false
+  }
+}

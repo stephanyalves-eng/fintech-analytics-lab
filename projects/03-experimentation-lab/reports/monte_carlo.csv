@@ -1,0 +1,11 @@
+# data_origin=derived (Monte Carlo on synthetic assumptions); G3/G4 [TO VERIFY]
+check,reps,n_per_arm,rate,expected
+P01 type I error (true diff 0),2000,25016,0.043,~0.05
+P01 power (true diff = MDE),2000,25016,0.997,>= 0.80
+G5 pass rate at true diff 0 (power),2000,25016,0.998,>= 0.80
+G5 pass rate at true diff = margin (type I),2000,25016,0.031,<= 0.025
+G1 pass rate at true diff 0 (power),2000,25016,0.8535,~0.80
+G1 pass rate at true diff = margin (type I),2000,25016,0.027,<= 0.025
+G2 pass rate at true diff 0 (power),2000,25016,0.9985,~0.80
+G2 pass rate at true diff = margin (type I),2000,25016,0.0185,<= 0.025
+Joint Launch power P01+G1+G2+G5 (protocol approx 0.7869),2000,25016,0.857,compare with protocol approximation

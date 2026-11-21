@@ -1,0 +1,8 @@
+# P3.4 HYPOTHETICAL economic assumptions. NOT observed, NOT locked in the protocol.
+# They inform the decision memo only; the launch rule comes from the locked protocol.
+# Every value is [TO VERIFY] before any real use.
+data_origin: synthetic_hypothetical
+take_rate_pct: 0.015            # share of approved amount kept as revenue (assumed MDR)
+chargeback_fee_brl: 15.0        # fixed fee per chargeback, on top of the refunded amount
+annual_eligible_users: 730000   # = 2,000 new eligible users/day x 365 (protocol traffic assumption)
+implementation_cost_brl: 150000 # one-off engineering/risk-model cost (assumed)

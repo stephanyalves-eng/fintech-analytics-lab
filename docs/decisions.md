@@ -28,3 +28,8 @@
 | 2026-11-21 | P3.1: n = máximo entre primária e guardrails de proporção (poder ≥ 0,80 em cada) | Com o n da primária (9.335), o G1 teria poder ≈ 0,40 e o Launch seria quase sempre inconclusivo |
 | 2026-11-21 | P3.1: guardrails via interseção-união (todos precisam passar), sem Holm | A IUT controla α sem ajuste; Holm (proposto no plano) seria desnecessariamente conservador |
 | 2026-11-21 | P3.1: lock por SHA-256 de texto normalizado em LF; mudança só via `--amend` registrado | Checkout CRLF no Windows não quebra o hash; emendas ficam auditáveis |
+| 2026-11-21 | P3.2: efeito verdadeiro em `simulation.yaml`; análise proibida de importá-lo (teste AST) | Separação gerador × análise exigida no aceite |
+| 2026-11-21 | P3.2: trilha incompleta = aprovação sem tentativa ou lacuna de numeração | Detectável só por eventos; fração é piso |
+| 2026-11-21 | P3.3: G1/G2/G4 por razão com variância por usuário (delta); G3 bootstrap por usuário | Tentativas/pagamentos repetidos não são independentes |
+| 2026-11-21 | P3.4: economia hipotética em `economics.yaml`, fora do lock, sem efeito na decisão | O protocolo define a regra; economia só informa |
+| 2026-11-21 | P3: Ruff ignora E501 em `p3_experiments` e no app P3 | Literais densos com `# fmt: skip` |

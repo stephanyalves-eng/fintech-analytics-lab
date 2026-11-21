@@ -37,3 +37,8 @@ select = ["E", "F", "I", "B", "UP"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 addopts = "-ra"
+
+[tool.ruff.lint.per-file-ignores]
+# P3 keeps dense `# fmt: skip` dict literals for readability; long lines are intentional there.
+"src/fintech_lab/p3_experiments/*.py" = ["E501"]
+"projects/03-experimentation-lab/app/*.py" = ["E501"]

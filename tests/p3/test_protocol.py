@@ -114,7 +114,8 @@ def test_lock_ignores_crlf(proto_copy):
     root, lock = proto_copy
     write_lock(root, lock)
     md = root / "docs" / "protocol.md"
-    md.write_bytes(md.read_bytes().replace(b"\n", b"\r\n"))
+    lf = md.read_bytes().replace(b"\r\n", b"\n")  # checkout may already be CRLF (autocrlf)
+    md.write_bytes(lf.replace(b"\n", b"\r\n"))
     verify_lock(root, lock)
 
 

@@ -1,0 +1,72 @@
+# P3.2 simulation config — the DATA-GENERATING TRUTH.
+# SYNTHETIC. Read ONLY by fintech_lab.p3_experiments.simulator. The analysis pipeline
+# (analysis/decision/economics/montecarlo/dashboard) must never import or read this file;
+# tests/p3/test_separation.py enforces it.
+
+population:
+  candidate_users: 54300          # ~3% excluded -> ~52.7k eligible (protocol plans 52,666)
+  internal_share: 0.01
+  prefraud_blocked_share: 0.02
+  returning_share: 0.40
+  credit_card_share: 0.70
+  enrollment_days: 28
+  weekend_weight: 1.3             # weekly seasonality in arrival
+  start_date: "2026-03-02"
+  high_risk_share: 0.20           # latent; never exported
+
+baseline:                         # arm A (mandatory 3DS)
+  p_attempt: 0.75                 # exposed user reaches a payment attempt within 7 days
+  p_retry: 0.50                   # after a failed attempt, user retries (max 3 attempts)
+  p_technical_error: 0.020        # per attempt
+  p_approve_given_ok: 0.70        # per attempt that is not a technical error
+  chargeback_rate: 0.004          # per approved payment
+  latency_median_ms: 1800
+  latency_sigma: 0.5
+  cost_processing_pct: 0.010      # of attempt amount (all attempts), BRL
+  cost_3ds_fee_brl: 0.12          # per attempt that runs a 3DS step
+  ticket_median_brl: 180
+  ticket_sigma: 0.8
+
+# True effect of B relative to A. Low-risk users skip the challenge in B; high-risk keep it.
+scenarios:
+  "null":
+    description: B has no effect on any metric
+    seed: 3101
+    effect: {}
+  positive:
+    description: B lowers friction for low-risk users; chargebacks unchanged; latency and cost lower
+    seed: 3102
+    effect:
+      p_attempt_delta_low_risk: 0.03
+      p_approve_delta_low_risk: 0.012
+      latency_median_ratio_low_risk: 0.70
+      cost_3ds_fee_ratio_low_risk: 0.40
+  negative:
+    description: B loses conversion and triples chargebacks
+    seed: 3103
+    effect:
+      p_attempt_delta_low_risk: -0.04
+      p_approve_delta_low_risk: -0.02
+      chargeback_ratio: 3.0
+      p_technical_error_delta: 0.01
+  srm:
+    description: positive effect, but 8% of B users lose their exposure log (logging bug)
+    seed: 3104
+    effect:
+      p_attempt_delta_low_risk: 0.03
+      p_approve_delta_low_risk: 0.012
+      latency_median_ratio_low_risk: 0.70
+      cost_3ds_fee_ratio_low_risk: 0.40
+    logging:
+      drop_exposure_share_B: 0.08
+  missing:
+    description: positive effect, but attempt events are dropped (10% in B, 1% in A)
+    seed: 3105
+    effect:
+      p_attempt_delta_low_risk: 0.03
+      p_approve_delta_low_risk: 0.012
+      latency_median_ratio_low_risk: 0.70
+      cost_3ds_fee_ratio_low_risk: 0.40
+    logging:
+      drop_attempt_share_A: 0.01
+      drop_attempt_share_B: 0.10
