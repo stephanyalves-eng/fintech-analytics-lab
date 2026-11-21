@@ -11,3 +11,7 @@
 | 2026-11-21 | P1: máx. 3 tentativas; retry só após soft decline ou erro técnico | Ciclo de vida inequívoco e testável |
 | 2026-11-21 | P1: settlement D+N simples, sem chargeback/refund | Escopo do MVP |
 | 2026-11-21 | P1: take rate/net revenue marcadas `[TO VERIFY]` (MDR sintético) | Não apresentar receita fictícia como real |
+| 2026-11-21 | P1.2: volume = maior prefixo de pagamentos i.i.d. com Σ tentativas ≤ alvo | Mantém o alvo de tentativas sem enviesar a amostra |
+| 2026-11-21 | P1.2: risco por pagamento é latente (não exportado) | Confundidor oculto realista; evita "vazar" a resposta |
+| 2026-11-21 | P1.2: dinheiro em Parquet como decimal(18,2), FX decimal(18,8) | Somas exatas nos checks de reconciliação |
+| 2026-11-21 | P1.3: checks e análises como blocos `-- name:` em arquivos SQL | SQL legível/versionado; o runner Python só conta linhas violadoras |

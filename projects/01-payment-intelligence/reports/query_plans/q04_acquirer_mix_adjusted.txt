@@ -1,0 +1,124 @@
+-- data_origin: derived from synthetic data (observed plan, not a benchmark claim)
+-- duckdb 2.0.1 | python 3.12.10
+-- os: Windows-11-10.0.26300-SP0
+-- cpu: Intel64 Family 6 Model 154 Stepping 3, GenuineIntel | logical cores: 20
+-- duckdb threads: 20
+-- dataset: fct_payment=447,090 rows, fct_attempt=500,000 rows
+-- query: q04_acquirer_mix_adjusted | wall time (2nd run): 10.3 ms
+
+╭─ Summary ───────────╮
+│ Total Time: 0.0115s │
+╰─────────────────────╯
+╭─ CTE ────────────────────────────────────╮
+│ CTE Name: seg                            │
+│ Table Index: 0                           │
+│ Execution Mode: HYBRID_FANOUT            │
+│ Fanout Mode: DIRECT                      │
+│ Consumers: 1                             │
+│ Direct Consumers: 1                      │
+│ Buffered Consumers: 0                    │
+│ Chunk Storage: NONE                      │
+│ Order Mode: UNORDERED                    │
+│ Materialized Consumers: 1                │
+│ 0 rows                               0µs │
+╰─────────────────────┬────────────────────╯
+                      ├──────────────────────────────────────────────────────────────────────────────╮
+╭─ Projection ────────┴────────────────────╮  ╭─ Projection ─────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+│ Projections:                             │  │ Projections:                                                                                                │
+│ __internal_decompress_string(#0),        │  │ __internal_decompress_string(#0), __internal_decompress_string(#1), #2, #3, #4, #5, #6                      │
+│ __internal_decompress_string(#1),        │  │ 6 rows                                                                                                  0µs │
+│ __internal_decompress_string(#2),        │  ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+│ __internal_decompress_string(#3), #4, #5 │  ╭─ Order By ───────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+│ 48 rows                              0µs │  │ Order By: country ASC, rank_adjusted ASC                                                                    │
+╰─────────────────────┬────────────────────╯  │ 6 rows                                                                                                  0µs │
+╭─ Hash Group By ─────┴────────────────────╮  ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+│ Groups: #0, #1, #2, #3                   │  ╭─ Projection ─────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+│ Aggregates: sum_no_overflow(#4),         │  │ Projections:                                                                                                │
+│             sum_no_overflow(#5)          │  │ __internal_compress_string_uinteger(#0), __internal_compress_string_uhugeint(#1), #2, #3, #4, #5, #6        │
+│ 48 rows                              0µs │  │ 6 rows                                                                                                  0µs │
+╰─────────────────────┒┎───────────────────╯  ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+╭─ Projection ────────┚┖───────────────────╮  ╭─ Projection ─────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+│ Projections: country, acquirer_id,       │  │ Projections: country, acquirer_id, attempts, m01_raw, m01_mix_adjusted, mix_coverage, rank_adjusted         │
+│              method_code,                │  │ 6 rows                                                                                                  0µs │
+│              amount_band_brl, attempts,  │  ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+│              approved                    │  ╭─ Projection ─────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+│ 576 rows                             0µs │  │ Projections: #0, #1, #2, #3, #4, #5, #6                                                                     │
+╰─────────────────────┒┎───────────────────╯  │ 6 rows                                                                                                  0µs │
+╭─ Projection ────────┚┖───────────────────╮  ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+│ Projections:                             │  ╭─ Window ─────────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+│ __internal_compress_string_uhugeint(#0), │  │ Projections:                                                                                                │
+│ __internal_compress_string_uinteger(#1), │  │ rank() OVER (PARTITION BY country ORDER BY (sum((m01_seg * seg_weight)) / sum(seg_weight)) DESC NULLS LAST) │
+│ __internal_compress_string_uhugeint(#2), │  │ 6 rows                                                                                                  0µs │
+│ __internal_compress_string_uhugeint(#3), │  ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+│ #4, #5                                   │  ╭─ Projection ─────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+│ 576 rows                             0µs │  │ Projections:                                                                                                │
+╰─────────────────────┒┎───────────────────╯  │ __internal_decompress_string(#0), __internal_decompress_string(#1), #2, #3, #4, #5                          │
+╭─ Table Scan ────────┚┖───────────────────╮  │ 6 rows                                                                                                  0µs │
+│ Table: p1.main.mart_acquirer_performance │  ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+│ Type: Sequential Scan                    │  ╭─ Hash Group By ──────────────────────────────────────┴──────────────────────────────────────────────────────╮
+│ Projections: method_code, country,       │  │ Groups: #0, #1                                                                                              │
+│              acquirer_id,                │  │ Aggregates: sum(#2), sum(#3), sum(#4), sum(#5)                                                              │
+│              amount_band_brl, attempts,  │  │ 6 rows                                                                                                  0µs │
+│              approved                    │  ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+│ Filters: method_code != 'pix'            │  ╭─ Projection ─────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+│ Row Groups Scanned: 1 / 1                │  │ Projections:                                                                                                │
+│ 576 rows                             0µs │  │ #0, #1, #2, #3, (CAST(#3 AS DOUBLE) / CAST(#2 AS DOUBLE)) * seg_weight, seg_weight                          │
+╰──────────────────────────────────────────╯  │ 48 rows                                                                                                 0µs │
+                                              ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+                                              ╭─ Projection ─────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+                                              │ Projections:                                                                                                │
+                                              │ __internal_compress_string_uinteger(#0), __internal_compress_string_uhugeint(#1), #2, #3, #4                │
+                                              │ 48 rows                                                                                                 0µs │
+                                              ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+                                              ╭─ Hash Join ──────────────────────────────────────────┴──────────────────────────────────────────────────────╮
+                                              │ Join Type: INNER                                                                                            │
+                                              │ Conditions:                                                                                                 │
+                                              │ country = country, amount_band_brl = amount_band_brl, method_code = method_code                             │
+                                              │ 48 rows                                                                                                 0µs │
+                                              ╰──────────────────────────────────────────────────────┬──────────────────────────────────────────────────────╯
+                                                                                                     ├──────────────────────────────────────────────────────────────────────────────────╮
+                                              ╭─ CTE Scan ───────────────────────────────────────────┴──────────────────────────────────────────────────────╮  ╭─ Projection ───────────┴───────────────────────╮
+                                              │ CTE Index: 0                                                                                                │  │ Projections: #0, #1, #2, #3, #4, seg_weight    │
+                                              │ 48 rows                                                                                                 0µs │  │ 24 rows                                    0µs │
+                                              ╰─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯  ╰────────────────────────┬───────────────────────╯
+                                                                                                                                                               ╭─ Projection ───────────┴───────────────────────╮
+                                                                                                                                                               │ Projections: #0, #1, #2, #3, #4                │
+                                                                                                                                                               │ 24 rows                                    0µs │
+                                                                                                                                                               ╰────────────────────────┬───────────────────────╯
+                                                                                                                                                               ╭─ Window ───────────────┴───────────────────────╮
+                                                                                                                                                               │ Projections:                                   │
+                                                                                                                                                               │ sum(sum(attempts)) OVER (PARTITION BY country) │
+                                                                                                                                                               │ 24 rows                                    0µs │
+                                                                                                                                                               ╰────────────────────────┬───────────────────────╯
+                                                                                                                                                               ╭─ Projection ───────────┴───────────────────────╮
+                                                                                                                                                               │ Projections:                                   │
+                                                                                                                                                               │ __internal_decompress_string(#0),              │
+                                                                                                                                                               │ __internal_decompress_string(#1),              │
+                                                                                                                                                               │ __internal_decompress_string(#2), #3           │
+                                                                                                                                                               │ 24 rows                                    0µs │
+                                                                                                                                                               ╰────────────────────────┬───────────────────────╯
+                                                                                                                                                               ╭─ Hash Group By ────────┴───────────────────────╮
+                                                                                                                                                               │ Groups: #0, #1, #2                             │
+                                                                                                                                                               │ Aggregates: sum(#3)                            │
+                                                                                                                                                               │ 24 rows                                 10.0ms │
+                                                                                                                                                               ╰────────────────────────┬───────────────────────╯
+                                                                                                                                                               ╭─ Projection ───────────┴───────────────────────╮
+                                                                                                                                                               │ Projections: country, method_code,             │
+                                                                                                                                                               │              amount_band_brl, attempts         │
+                                                                                                                                                               │ 48 rows                                    0µs │
+                                                                                                                                                               ╰────────────────────────┬───────────────────────╯
+                                                                                                                                                               ╭─ Projection ───────────┴───────────────────────╮
+                                                                                                                                                               │ Projections:                                   │
+                                                                                                                                                               │ __internal_compress_string_uinteger(#0), #1,   │
+                                                                                                                                                               │ __internal_compress_string_uhugeint(#2),       │
+                                                                                                                                                               │ __internal_compress_string_uhugeint(#3), #4,   │
+                                                                                                                                                               │ #5                                             │
+                                                                                                                                                               │ 48 rows                                    0µs │
+                                                                                                                                                               ╰────────────────────────┬───────────────────────╯
+                                                                                                                                                               ╭─ CTE Scan ─────────────┴───────────────────────╮
+                                                                                                                                                               │ CTE Index: 0                                   │
+                                                                                                                                                               │ CTE Mode: DIRECT                               │
+                                                                                                                                                               │ Consumer: 1                                    │
+                                                                                                                                                               │ 48 rows                                    0µs │
+                                                                                                                                                               ╰────────────────────────────────────────────────╯
+

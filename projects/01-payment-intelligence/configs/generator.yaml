@@ -1,0 +1,99 @@
+# P1 synthetic PSP generator — ALL parameters are synthetic (data_origin: synthetic).
+# They are chosen to produce plausible, non-uniform shapes. They are NOT calibrated to
+# any real-world industry benchmark and must not be read as real prices or approval rates.
+data_origin: synthetic
+seed: 20261121
+target_attempts: 500000        # default; scales to 2_000_000 (--attempts)
+start_date: "2025-01-01"
+days: 365
+n_merchants: 300
+
+countries:
+  BR: {weight: 0.60, currency: BRL, timezone: America/Sao_Paulo, fx_start: 1.0, fx_daily_vol: 0.0}
+  MX: {weight: 0.25, currency: MXN, timezone: America/Mexico_City, fx_start: 0.28, fx_daily_vol: 0.006}
+  CL: {weight: 0.15, currency: CLP, timezone: America/Santiago, fx_start: 0.0058, fx_daily_vol: 0.007}
+
+currency_decimals: {BRL: 2, MXN: 2, CLP: 0}
+
+sectors:            # amount ~ lognormal(log(median_brl), sigma) in BRL-equivalent, then converted
+  ecommerce_retail: {weight: 0.35, median_brl: 150, sigma: 0.8, logit_effect: 0.0}
+  digital_goods:    {weight: 0.20, median_brl: 40, sigma: 0.6, logit_effect: -0.3}
+  travel:           {weight: 0.10, median_brl: 900, sigma: 0.7, logit_effect: -0.2}
+  food_delivery:    {weight: 0.20, median_brl: 60, sigma: 0.4, logit_effect: 0.1}
+  subscriptions:    {weight: 0.15, median_brl: 50, sigma: 0.3, logit_effect: -0.1}
+
+size_tiers:         # volume weight multiplies a lognormal(0, 0.5) merchant heterogeneity term
+  small: {weight: 0.60, volume_weight: 1}
+  mid:   {weight: 0.30, volume_weight: 5}
+  large: {weight: 0.10, volume_weight: 25}
+
+merchant_logit_sd: 0.3
+merchant_preexisting_share: 0.6   # active before start_date; the rest activate during the period
+primary_acquirer_share: 0.85      # share of first attempts routed to the merchant's primary acquirer
+
+methods:
+  credit_card: {family: card, settlement_lag_days: 2, logit_effect: 0.0}
+  debit_card:  {family: card, settlement_lag_days: 1, logit_effect: -0.2}
+  pix:         {family: instant_transfer, settlement_lag_days: 0, logit_effect: 0.0}
+
+method_mix:
+  BR: {credit_card: 0.50, debit_card: 0.15, pix: 0.35}
+  MX: {credit_card: 0.55, debit_card: 0.45}
+  CL: {credit_card: 0.50, debit_card: 0.50}
+
+acquirers:          # base_logit: approval log-odds given no technical error
+  ACQ_BR_A: {country: BR, type: card_acquirer, routing_weight: 0.6, base_logit: 1.6, error_rate: 0.015, peak_error_mult: 1.0, latency_median_ms: 420, fee_fixed_local: 0.15, fee_bps_approved: 180}
+  ACQ_BR_B: {country: BR, type: card_acquirer, routing_weight: 0.4, base_logit: 1.3, error_rate: 0.025, peak_error_mult: 2.5, latency_median_ms: 520, fee_fixed_local: 0.10, fee_bps_approved: 160}
+  PIX_BR:   {country: BR, type: pix_provider, routing_weight: 1.0, base_logit: 3.2, error_rate: 0.010, peak_error_mult: 1.0, latency_median_ms: 260, fee_fixed_local: 0.05, fee_bps_approved: 20}
+  ACQ_MX_A: {country: MX, type: card_acquirer, routing_weight: 0.5, base_logit: 1.2, error_rate: 0.030, peak_error_mult: 1.2, latency_median_ms: 480, fee_fixed_local: 0.60, fee_bps_approved: 200}
+  ACQ_MX_B: {country: MX, type: card_acquirer, routing_weight: 0.5, base_logit: 1.45, error_rate: 0.020, peak_error_mult: 1.0, latency_median_ms: 450, fee_fixed_local: 0.75, fee_bps_approved: 210}
+  ACQ_CL_A: {country: CL, type: card_acquirer, routing_weight: 0.7, base_logit: 1.4, error_rate: 0.020, peak_error_mult: 1.0, latency_median_ms: 400, fee_fixed_local: 30, fee_bps_approved: 190}
+  ACQ_CL_B: {country: CL, type: card_acquirer, routing_weight: 0.3, base_logit: 1.1, error_rate: 0.035, peak_error_mult: 1.3, latency_median_ms: 560, fee_fixed_local: 25, fee_bps_approved: 170}
+
+peak_hours_local: [19, 20, 21, 22]
+night_hours_local: [0, 1, 2, 3, 4, 5]
+night_logit_effect: -0.4
+amount_band_logit:   # BRL-equivalent bands (metric catalog): <50, 50-200, 200-1000, >=1000
+  edges_brl: [50, 200, 1000]
+  effects: [0.2, 0.0, -0.3, -0.7]
+attempt_logit_effect: {1: 0.0, 2: -0.3, 3: -0.5}
+risk:                # latent per-payment risk ~ Beta(a, b); not exported (hidden confounder)
+  beta_a: 2.0
+  beta_b: 8.0
+  logit_coef: -1.5
+  hard_share_base: 0.25   # P(hard | declined) = base + slope * risk
+  hard_share_slope: 0.4
+
+decline_code_weights:
+  soft: {insufficient_funds: 0.45, limit_exceeded: 0.20, do_not_honor: 0.30, issuer_unavailable: 0.05}
+  hard: {suspected_fraud: 0.40, invalid_card: 0.30, expired_card: 0.30}
+  technical: {timeout: 0.60, acquirer_error: 0.40}
+timeout_ms: 10000
+
+retry:
+  max_attempts: 3
+  prob_after_soft: 0.55
+  prob_after_technical: 0.80
+  switch_prob_soft: 0.30       # move to another acquirer of the same country and type
+  switch_prob_technical: 0.60
+  delay_mean_s_soft: 1200
+  delay_mean_s_technical: 30
+
+seasonality:
+  weekday: [1.00, 1.00, 1.02, 1.05, 1.15, 1.10, 0.90]   # Mon..Sun
+  month: [0.90, 0.92, 0.97, 0.98, 1.00, 0.98, 1.00, 1.00, 1.02, 1.05, 1.25, 1.30]
+  annual_growth: 0.30          # linear trend over the period
+  peak_days: {"2025-11-28": 2.5, "2025-12-01": 1.6}   # synthetic Black-Friday-like spikes
+  hour: [0.15, 0.08, 0.05, 0.04, 0.05, 0.10, 0.25, 0.50, 0.80, 1.00, 1.10, 1.15,
+         1.20, 1.15, 1.10, 1.05, 1.05, 1.10, 1.20, 1.35, 1.40, 1.25, 0.90, 0.45]
+
+device_mobile_share: 0.60
+
+mdr:                 # synthetic merchant discount rate (fraction) by method x size tier [TO VERIFY]
+  credit_card: {small: 0.039, mid: 0.032, large: 0.025}
+  debit_card:  {small: 0.024, mid: 0.019, large: 0.015}
+  pix:         {small: 0.010, mid: 0.008, large: 0.005}
+
+corrupted_fixture:
+  n_payments: 2000
+  seed_offset: 7
