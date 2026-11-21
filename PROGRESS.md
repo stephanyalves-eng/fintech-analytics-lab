@@ -28,3 +28,4 @@ P2.1 (desenho do forecasting) ou auditoria independente do P3 (M7). Pendências 
 - 2026-11-21 P3.3: `analysis.py` (lock → portões → P01 → G1–G5 → sensibilidade); G1/G2/G4 com variância por usuário, G3 bootstrap. `montecarlo.py`: tipo I de P01 0,043; guardrails na margem 0,027/0,0185/0,031 (limítrofe, ver `docs/methods.md`). G3/G4 [TO VERIFY].
 - 2026-11-21 P3.4: `decision.py` (regra travada), `economics.py` (hipotética), memos por cenário. Resultado: null INCONCLUSIVE, positive LAUNCH, negative DO NOT LAUNCH, srm e missing INVALID.
 - 2026-11-21 P3.5: dashboard Streamlit (7 abas, 5 cenários), AppTest e 8 screenshots reais. Teclado e leitor de tela [TO VERIFY].
+- 2026-11-21 P3 ressalvas: MC com 20.000 reps. Tipo I ok em P01/G1/G4/G5; G2 0,028 (leve excesso). G5 0,031 era ruído. G4 tem poder 0,35 sem degradação: gargalo do Launch, decisão de protocolo pendente. Design effect observado ≈ 1,0 (por construção). G3 grosseiro (300 sims).

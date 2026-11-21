@@ -22,10 +22,24 @@ Dados 100% **sintéticos**. Parâmetros do protocolo: [`protocol.md`](protocol.m
 
 O MDE reportado é de **desenho** no n observado, não poder observado. O design effect observado é calculado por guardrail e fica em `results.json`.
 
-## Monte Carlo (`reports/monte_carlo.csv`, 2000 reps)
-Usa os mesmos estimadores da análise sobre usuários simulados diretamente. Não cobre G3 e G4 [TO VERIFY]. O poder conjunto cobre P01, G1, G2 e G5 e supõe guardrails sem degradação.
-- Erro tipo I de P01 ≈ 0,043 (esperado ~0,05). Nos guardrails de não inferioridade, a taxa de "pass" com degradação igual à margem ficou em 0,027 (G1), 0,0185 (G2) e 0,031 (G5), contra 0,025 esperado. Com 2000 repetições o erro-padrão é ≈ 0,0035, então G5 está cerca de 1,7 EP acima: **limítrofe, não conclusivo**. Aumentar as repetições antes de afirmar controle de erro.
-- O poder simulado de G1 (0,85) e o conjunto (0,86) ficaram acima da aproximação do protocolo (0,79), porque o design effect simulado é menor que o 1,2 assumido. Isso não valida o 1,2.
+## Monte Carlo (`reports/monte_carlo.csv`, 20.000 repetições; G4 com 2.000 e G3 com 300)
+Usa os mesmos estimadores da análise sobre usuários simulados diretamente, com `mc_se` por linha. O poder conjunto cobre só P01, G1, G2 e G5 e supõe guardrails sem degradação.
+
+| Verificação | Taxa (± EP) | Leitura |
+|---|---|---|
+| P01 erro tipo I | 0,0500 ± 0,0015 | calibrado |
+| G5 / G1 / G4 "pass" na margem (tipo I) | 0,0243 / 0,0242 / 0,0235 | ≤ 0,025, ok |
+| G2 "pass" na margem (tipo I) | 0,0282 ± 0,0012 | **~2,7 EP acima de 0,025**: excesso pequeno e real |
+| G3 "pass" na margem (tipo I) | 0,033 ± 0,010 | grosseiro (300 simulações), inconclusivo |
+| Poder de P01 no MDE / G5 / G2 / G1 | 0,996 / 0,999 / 0,997 / 0,869 | acima de 0,80 |
+| **Poder de G4 sem degradação** | **0,35 ± 0,01** | **abaixo do alvo 0,80** |
+| Poder conjunto P01+G1+G2+G5 | 0,866 | acima da aproximação 0,79 do protocolo |
+
+- A taxa de 0,031 do G5 numa rodada de 2.000 repetições era ruído de Monte Carlo; com 20.000 ficou em 0,0243.
+- **G2:** o intervalo por delta é levemente anticonservador (0,028 contra 0,025). O desvio é pequeno. Corrigir exigiria trocar o método do intervalo, o que é uma emenda ao protocolo e não foi feita.
+- **G4 é o gargalo de "Launch".** O n do protocolo foi dimensionado por G1 e não cobre G4 (sem poder pré-experimento em forma fechada). Com a variância de ticket assumida no simulador, G4 fica `undetermined` na maioria dos experimentos sem diferença real. Como G4 precisa passar para lançar, o poder real de Launch é bem menor que 0,87, e o produto simples com G4 dá uma ordem de grandeza de ~0,3 (independência assumida, não simulada em conjunto). Resolver exige decisão: aumentar n, alargar a margem de 2% ou aceitar. Isso muda o protocolo e fica para você decidir.
+- O poder de G1 (0,87) e o conjunto (0,87) superam a aproximação do protocolo porque o design effect de 1,2 é conservador para este simulador: o design effect observado em G1 e G2 nos cenários é ≈ 1,0 (`results.json`). Isso vale **por construção** (as tentativas de um usuário são independentes no simulador) e **não** valida nem refuta o 1,2 para dados reais.
+- O texto de `protocol.md` ainda diz "G3/G4 [TO VERIFY]". Ele está travado e não foi editado; esta seção o substitui como registro do que foi verificado.
 
 ## Decisão e economia (P3.4)
 `decision.py` aplica a ordem INVALID → DO NOT LAUNCH → LAUNCH → INCONCLUSIVE. `economics.py` usa premissas hipotéticas (`configs/economics.yaml`, fora do lock) e **não altera** a decisão. Segmentos são exploratórios.

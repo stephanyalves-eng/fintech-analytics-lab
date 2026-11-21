@@ -33,3 +33,4 @@
 | 2026-11-21 | P3.3: G1/G2/G4 por razão com variância por usuário (delta); G3 bootstrap por usuário | Tentativas/pagamentos repetidos não são independentes |
 | 2026-11-21 | P3.4: economia hipotética em `economics.yaml`, fora do lock, sem efeito na decisão | O protocolo define a regra; economia só informa |
 | 2026-11-21 | P3: Ruff ignora E501 em `p3_experiments` e no app P3 | Literais densos com `# fmt: skip` |
+| 2026-11-21 | P3: G4 (poder 0,35 sem degradação) e G2 (tipo I 0,028) ficam documentados, sem emenda ao protocolo | Decisão do usuário: só documentar; n, margem e método do intervalo permanecem como travados |

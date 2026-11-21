@@ -181,3 +181,13 @@ def test_analysis_never_touches_simulation_truth():
         mods, strs = _code_facts(f)
         assert not any("simulator" in m for m in mods), f.name
         assert not any("simulation" in s or "truth" in s for s in strs), f.name
+
+
+def test_monte_carlo_runs_and_reports_se():
+    from fintech_lab.p3_experiments.montecarlo import run_all
+
+    rows = run_all(reps=15)
+    ids = " ".join(r["check"] for r in rows)
+    for k in ("P01", "G1", "G2", "G3", "G4", "G5", "Joint"):
+        assert k in ids
+    assert all(0 <= r["rate"] <= 1 and r["mc_se"] >= 0 for r in rows)

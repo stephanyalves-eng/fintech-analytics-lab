@@ -19,4 +19,4 @@ python -m fintech_lab.p3_experiments.cli dashboard   # http://localhost:8502
 - Os cenários provam que o **motor** distingue efeito, ausência de efeito, SRM e dados ausentes. Não dizem nada sobre um 3DS real.
 - Intervalo que inclui zero não é "sem efeito". Guardrail `undetermined` não é segurança.
 - A decisão vem só do protocolo travado; economia e segmentos não a alteram.
-- Limítrofe: o erro tipo I dos guardrails no Monte Carlo ficou um pouco acima de 0,025 (ver methods.md).
+- Ressalvas medidas (ver methods.md): o G2 tem erro tipo I de 0,028 (leve excesso) e o G4 tem poder de só 0,35, o que limita a chance real de "Launch".

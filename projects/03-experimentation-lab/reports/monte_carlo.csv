@@ -1,11 +1,15 @@
-# data_origin=derived (Monte Carlo on synthetic assumptions); G3/G4 [TO VERIFY]
-check,reps,n_per_arm,rate,expected
-P01 type I error (true diff 0),2000,25016,0.043,~0.05
-P01 power (true diff = MDE),2000,25016,0.997,>= 0.80
-G5 pass rate at true diff 0 (power),2000,25016,0.998,>= 0.80
-G5 pass rate at true diff = margin (type I),2000,25016,0.031,<= 0.025
-G1 pass rate at true diff 0 (power),2000,25016,0.8535,~0.80
-G1 pass rate at true diff = margin (type I),2000,25016,0.027,<= 0.025
-G2 pass rate at true diff 0 (power),2000,25016,0.9985,~0.80
-G2 pass rate at true diff = margin (type I),2000,25016,0.0185,<= 0.025
-Joint Launch power P01+G1+G2+G5 (protocol approx 0.7869),2000,25016,0.857,compare with protocol approximation
+# data_origin=derived (Monte Carlo on synthetic assumptions); G3 coarse (300 sims), G4 2000 sims
+check,reps,n_per_arm,rate,mc_se,expected
+P01 type I error (true diff 0),20000,25016,0.04995,0.001540373290796747,~0.05
+P01 power (true diff = MDE),20000,25016,0.99645,0.0004205590029948267,>= 0.80
+G5 pass rate at true diff 0 (power),20000,25016,0.9994,0.00017315311143609936,>= 0.80
+G5 pass rate at true diff = margin (type I),20000,25016,0.02425,0.0010877025673409067,<= 0.025
+G1 pass rate at true diff 0 (power),20000,25016,0.86865,0.0023884846398919963,~0.80
+G1 pass rate at true diff = margin (type I),20000,25016,0.02415,0.0010855131850880486,<= 0.025
+G2 pass rate at true diff 0 (power),20000,25016,0.997,0.00038671695075339035,~0.80
+G2 pass rate at true diff = margin (type I),20000,25016,0.0282,0.0011705716552180819,<= 0.025
+G4 pass rate at true ratio 1.00 (power),2000,25016,0.3475,0.010647622974166581,~0.80
+G4 pass rate at true ratio = 1 + margin (type I),2000,25016,0.0235,0.0033873108803297047,<= 0.025
+G3 pass rate at true diff 0 (power; coarse),300,25016,1.0,0.0,~0.80
+G3 pass rate at true diff = margin (type I; coarse),300,25016,0.03333333333333333,0.010363754503432016,<= 0.025
+Joint Launch power P01+G1+G2+G5 (protocol approx 0.7869),20000,25016,0.86595,0.002409155427738111,compare with protocol approximation
