@@ -12,7 +12,7 @@
 | M7 auditoria/publicação | pendente | |
 
 ## Próximo passo
-auditoria independente final (M7) e publicação do repositório (CI nunca rodou; sem remote) independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
+pendências abertas da auditoria M7 (teclado humano e leitor de tela, L8 mantido) e publicação de posts/kits (não criados) independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
 
 ## Log
 - 2026-11-21 M0: estrutura do monorepo, pyproject, ruff, pytest e CI criados.
@@ -41,3 +41,4 @@ auditoria independente final (M7) e publicação do repositório (CI nunca rodou
 - 2026-11-21 Auditoria final M7 (só relatório, nada corrigido; `docs/audit_m7_final.md`): clone limpo reproduz tudo (ruff ok; pytest 164 passed; hashes P1/P2 idênticos; P3 igual aos relatórios; recálculo independente do backtest sem divergência). Achados: 0 críticos, 1 alto (README raiz desatualizado), 4 médios (alegação "fixado antes de olhar o T4" sem respaldo na história do git; docs P2 divergentes do código; aviso MPL do axe-core ausente; CI nunca executado), 9 baixos (inclui Low do P1 ainda abertos).
 - 2026-11-21 Remediação M7 (H1, M1–M3): README raiz atualizado; alegações de pré-registro corrigidas; docs do P2 alinhados ao código; `THIRD_PARTY_NOTICES.md` e axe-core em cópia única (`shared/vendor`). M4 (CI) e L1–L9 seguem abertos.
 - 2026-11-21 Remediação dos baixos M7 (L1–L9): P1 (memo determinístico, `.env.example`, teste S2 cap 4, aviso de custo M09, check c14 de settlement + 15º defeito); `eol=lf` e `sec_per_fit` fora do CSV; features/rótulo do v1/aba Closing documentados; CDP compartilhado + teste de teclado automatizado nos 3 dashboards (parcial); `pip-audit`: 49 pacotes, 0 vulnerabilidades (pontual). L8 mantido de propósito; teclado humano, leitor de tela, Linux/macOS e CI seguem em aberto.
+- 2026-11-22 Publicação e CI: repositório público `stephanyalves-eng/fintech-analytics-lab` (branch main). CI no ubuntu passou duas vezes: 1ª execução (ruff, pytest 172, P1 generate/check/build, 3 min 40 s) e, depois de acrescentar pipeline + auditoria do P2 e verify/generate/analyze do P3 e subir as actions para checkout@v7/setup-python@v7 (sem o aviso de Node 20), a execução 44977708812 (5 min 1 s). Os orçamentos e campeões congelados no Windows foram verificados no Linux (dados e hashes batem). M4 da auditoria M7 fechado.

@@ -77,3 +77,12 @@ Os demais achados (M4 e L1–L9) continuam abertos.
 | L7 · portabilidade | CDP/descoberta de navegador centralizados em `fintech_lab/shared/browser_cdp.py` (variável `FAL_BROWSER`, caminhos Windows/macOS/Linux, nomes no PATH); P1, P2 e P3 usam o módulo (P2 não importa mais o P3 por caminho de arquivo) | capturas e axe rodaram de novo nos 3 projetos com o módulo novo; screenshots de P1/P3 restaurados do git; **Linux/macOS continuam sem teste** |
 | L8 · estatística aproximada | **Não alterado de propósito.** Trocar a regra de seleção do campeão depois de ver o holdout seria ajuste pós-hoc; o limite permanece documentado em `docs/methods.md` | — |
 | L9 · vulnerabilidades | `pip-audit 2.10.1` (instalado num diretório temporário, fora do `.venv`) sobre `requirements-lock.txt` com `--no-deps --disable-pip`: **49 pacotes auditados, 0 vulnerabilidades conhecidas, 0 ignorados** na base de avisos do PyPI no momento da execução (2026-11-21). Só nomes e versões de pacotes saíram da máquina | saída JSON lida; resultado é pontual e deve ser repetido antes de publicar |
+
+## Atualização pós-publicação (M4)
+O repositório foi publicado e o CI rodou no GitHub Actions (ubuntu, Python 3.12, `requirements-lock.txt`).
+- Execução 1 (ruff, `pytest -q`, smoke do P1): **sucesso**, 3 min 40 s.
+- Execução 2, com `p2 pipeline` + `p2 audit` e `p3 verify/generate/analyze` acrescentados ao workflow e as actions em `checkout@v7`/`setup-python@v7`: **sucesso**, 5 min 1 s ([44977708812](https://github.com/stephanyalves-eng/fintech-analytics-lab/actions/runs/44977708812)). O aviso de Node 20 deixou de aparecer.
+- O pipeline do P2 verificou no Linux os orçamentos v1/v2 e os campeões congelados no Windows (o `data_hash` do P1/P2 coincide): evidência de reprodutibilidade entre sistemas operacionais.
+
+**M4 fechado.** Continuam abertos: teclado humano e leitor de tela, tema escuro, L8 (mantido de propósito), os scripts de captura/teclado que exigem navegador (não rodam no CI) e a varredura de vulnerabilidades repetida antes de cada publicação.
+
