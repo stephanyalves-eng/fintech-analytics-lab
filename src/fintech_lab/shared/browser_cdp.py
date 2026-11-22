@@ -111,21 +111,31 @@ async def open_page(port: int, tag: str):
     if exe is None:
         raise SystemExit("No Edge/Chrome/Chromium found (set FAL_BROWSER to its path)")
     profile = tempfile.mkdtemp(prefix=f"{tag}_")
-    extra = ["--no-sandbox"] if os.environ.get("CI") or os.environ.get("FAL_NO_SANDBOX") else []
-    proc = subprocess.Popen(
-        [exe, "--headless=new", f"--remote-debugging-port={port}", f"--user-data-dir={profile}",
-         "--hide-scrollbars", "--force-color-profile=srgb", *extra, "about:blank"],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    for _ in range(50):
+    extra = []
+    if os.environ.get("CI") or os.environ.get("FAL_NO_SANDBOX"):  # containers/CI runners
+        extra = ["--no-sandbox", "--disable-dev-shm-usage", "--disable-gpu"]
+    log = Path(profile) / "browser.log"
+    with open(log, "wb") as fh:
+        proc = subprocess.Popen(
+            [exe, "--headless=new", f"--remote-debugging-port={port}", f"--user-data-dir={profile}",
+             "--hide-scrollbars", "--force-color-profile=srgb", *extra, "about:blank"],
+            stdout=fh, stderr=subprocess.STDOUT)
+    for _ in range(150):  # up to ~30 s: cold starts on shared runners can be slow
         try:
             pages = json.load(urllib.request.urlopen(f"http://127.0.0.1:{port}/json/list"))
             ws_url = next(p["webSocketDebuggerUrl"] for p in pages if p["type"] == "page")
             break
         except Exception:
+            if proc.poll() is not None:
+                break
             time.sleep(0.2)
     else:
+        ws_url = None
+    if ws_url is None:
+        tail = log.read_text(errors="ignore")[-1500:] if log.exists() else ""
+        code = proc.poll()
         close(proc, profile)
-        raise SystemExit("browser did not start")
+        raise SystemExit(f"browser did not start (exe={exe}, exit={code}):\n{tail}")
     return proc, profile, CDP(await websockets.connect(ws_url, max_size=None))
 
 
