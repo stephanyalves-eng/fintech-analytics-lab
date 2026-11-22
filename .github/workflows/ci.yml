@@ -7,8 +7,8 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -23,3 +23,11 @@ jobs:
       - run: python -m fintech_lab.p1_payments.cli generate
       - run: python -m fintech_lab.p1_payments.cli check
       - run: python -m fintech_lab.p1_payments.cli build
+      # P2 smoke: whole pipeline on the P1 dataset just generated, verifying the committed frozen
+      # budgets and champions (fails if the data they were frozen on changed), then the independent audit.
+      - run: python -m fintech_lab.p2_forecasting.cli pipeline --workers 2
+      - run: python -m fintech_lab.p2_forecasting.cli audit
+      # P3 smoke: locked protocol, generated scenarios, locked analysis.
+      - run: python -m fintech_lab.p3_experiments.cli verify
+      - run: python -m fintech_lab.p3_experiments.cli generate
+      - run: python -m fintech_lab.p3_experiments.cli analyze
