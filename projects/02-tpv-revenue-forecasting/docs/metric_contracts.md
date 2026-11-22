@@ -13,7 +13,7 @@ Convenções: valores em **BRL** (consolidação via `dim_fx_rate` do P1, FX da 
 | F06 | Chargebacks | pagamento → dia | Σ perda de chargeback, na **data do chargeback** (atraso D+k após criação) | — | synthetic | Chargebacks de pagamentos de T4 podem cair depois do horizonte; relatório diz isso |
 | F07 | Incentivos | dia | `incentive_rate × F01` | — | synthetic | Taxa em `configs/assumptions.yaml` |
 | F08 | Net revenue | dia | F04 − F02b − F06 − F07 | — | derived | F02b = fee devolvida em refunds = `refund_fee_return_ratio × fee do pagamento original × (refund/amount)`. O principal devolvido (F02) afeta o TPV líquido, não a receita |
-| F09 | Custo de processamento | tentativa → dia | Σ `processing_cost` (BRL) de **todas** as tentativas, na data da tentativa local | — | derived (P1 M08) | Inclui declinadas e retries |
+| F09 | Custo de processamento | tentativa → dia | Σ `processing_cost` (BRL) de **todas** as tentativas, na **data de criação local do pagamento** (regra de período do P1; R06 depende disso) | — | derived (P1 M08) | Inclui declinadas e retries |
 | F10 | Outros custos variáveis | dia | `var_cost_rate × F01` | — | synthetic | Ex.: antifraude, suporte |
 | F11 | Margem de contribuição | dia | F08 − F09 − F10 | — | derived | Não é lucro líquido; sem custos fixos |
 | F12 | Margem de contribuição % | recorte | F11 | F08 | derived | Indefinida se F08 = 0 |

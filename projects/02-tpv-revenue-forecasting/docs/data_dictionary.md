@@ -46,3 +46,12 @@ Rótulos: `observed` (nenhum no P2), `synthetic`, `derived`.
 - TPV, receita, custo: soma por dia no fuso local do merchant.
 - Take rate e margem %: razão de somas no recorte (nunca média de razões).
 - Dia sem venda de merchant ativo = 0 explícito; dia antes da ativação = ausente (não zero), para não penalizar o WAPE.
+
+## Implementação (P2.2)
+- Código: `src/fintech_lab/p2_forecasting/` (`mart.py`, `adjustments.py`, `calendar.py`, `budget.py`, `features.py`, `cli.py`); SQL em `sql/mart.sql` e `sql/checks.sql`.
+- Comando: `python -m fintech_lab.p2_forecasting.cli build` (mart + checks R01–R09 + R10 do orçamento + export em `data/p2/`, não versionado). O build recusa exportar se algum check falhar.
+- Arredondamento só no grão (dia × merchant × método), `DECIMAL(18,4)`; níveis superiores só somam, por isso as reconciliações são exatas.
+- Eventos de refund/chargeback fora da janela (depois de 2025-12-31) ficam em `syn_adjustment` e são contados no manifest, mas não entram no mart.
+- Feriados: conjunto curado por regra (datas fixas, Páscoa, n-ésima segunda); **não é calendário oficial completo** `[TO VERIFY]`. O gerador do P1 não modela feriados, então efeito de feriado deve dar ≈ 0.
+- Black Friday/Cyber Monday entram no calendário por regra (4ª sexta de novembro e +3 dias), conhecidos antes da origem.
+- `fct_forecast` e `fct_backtest_metrics` ficam para o P2.3.

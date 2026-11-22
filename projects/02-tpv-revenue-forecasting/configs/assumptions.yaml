@@ -1,0 +1,33 @@
+# P2 assumptions v1 — ALL values are synthetic proposals (see docs/assumptions.md). Not calibrated to real data.
+version: v1
+as_of: "2025-09-30"          # forecast cut-off (end of day, merchant local time)
+seed: 20262201               # synthetic refund/chargeback draws
+
+window:                      # mart window, merchant LOCAL date (Jan-2026 spill-over is excluded)
+  start: "2025-01-01"
+  end: "2025-12-31"
+
+splits:                      # chronological, contiguous, disjoint
+  train: ["2025-01-01", "2025-07-31"]
+  validation: ["2025-08-01", "2025-09-30"]
+  test: ["2025-10-01", "2025-12-31"]   # T4 holdout; never used for fitting or model selection
+
+refund:
+  rate_by_method: {credit_card: 0.020, debit_card: 0.010, pix: 0.005}   # share of succeeded payments
+  delay_days: [1, 14]                  # inclusive, uniform
+  fee_return_ratio: 1.0
+chargeback:
+  rate_by_method: {credit_card: 0.0025, debit_card: 0.0010, pix: 0.0}
+  delay_days: [15, 60]
+  fixed_fee_brl: 15.0
+incentive_rate: 0.0005       # share of TPV
+var_cost_rate: 0.0010        # share of TPV
+
+budget:
+  version: v1
+  as_of: "2024-12-31"
+  monthly_growth: 0.04       # PURPOSEFUL ERROR: P1 grows much faster
+  calibration_window: ["2025-01-01", "2025-01-31"]   # base level uses January only, never T4
+  refund_chargeback_share_of_fee: 0.02
+  processing_cost_share_of_tpv: 0.0035
+  # base_daily_tpv_brl and take_rate by country are frozen in configs/budget_v1.yaml

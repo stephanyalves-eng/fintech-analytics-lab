@@ -12,7 +12,7 @@
 | M7 auditoria/publicação | pendente | |
 
 ## Próximo passo
-P2.2 (dataset analítico, calibrar base do orçamento só com jan/2025) ou auditoria independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
+P2.3 (modelos, baselines e backtesting; etapa de desenho: propor plano e esperar aprovação) ou auditoria independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
 
 ## Log
 - 2026-11-21 M0: estrutura do monorepo, pyproject, ruff, pytest e CI criados.
@@ -33,3 +33,4 @@ P2.2 (dataset analítico, calibrar base do orçamento só com jan/2025) ou audit
 - 2026-11-21 Auditoria P3 (só relatório, nada corrigido): recálculo independente em DuckDB bate nos 5 cenários (P01, SRM, G1–G5); hash determinístico; protocolo travado inalterado desde o P3.1; IC cobre o efeito analítico verdadeiro nos 3 cenários válidos. Achados: M1 protocolo §7.3 diz que trilha incompleta não conta como conversão, mas o código conta (2.118 de 2.194 no cenário `missing`); L1 data de análise/maturação de 30 d não é imposta; L2 aba Results sem aviso quando o resultado é INVALID; L3 `decide()` sem teste unitário com entradas sintéticas.
 - 2026-11-21 Remediação auditoria P3 (M1, L1–L3): trilha incompleta não conta como conversão (protocolo §7.3); `observation_end` no manifest e análise recusa dados imaturos; aviso INVALID em 4 abas; testes unitários de `decide()` (ordem e bordas). Relatórios regenerados: só `missing` mudou (P01 −3,44 p.p., INVALID). Screenshots e auditoria axe não refeitos (valid scenarios inalterados; banners novos só em INVALID).
 - 2026-11-21 P2.1: plano aprovado (cut-off 2025-09-30; orçamento com erro proposital). Criados em `projects/02-tpv-revenue-forecasting/docs/`: problem_statement, metric_contracts (F01–F12, E01–E07, R01–R10), assumptions (refund/chargeback/orçamento v1/cenários) e data_dictionary (anti-leakage). Sem código; todos os valores de premissa são propostas sintéticas ainda não calibradas.
+- 2026-11-21 P2.2: mart diário DuckDB sobre o P1 (`cli build`): merchant (88.199 linhas), segmento, total (365 d), mensal; refund/chargeback sintéticos (5.112/522, seed fixa); calendário; orçamento v1 congelado (jan/2025, +4% a.m.) com hash; splits e features sem vazamento. Checks R01–R10 passam; build repetido ⇒ mesmos hashes. ruff ok; pytest 128 passed. Feriados por regra curada `[TO VERIFY]`; premissas ainda não calibradas.

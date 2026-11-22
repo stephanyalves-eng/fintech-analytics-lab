@@ -40,3 +40,9 @@
 | 2026-11-21 | P2.1: refund, chargeback, incentivo e custo variável sintéticos e determinísticos, reconhecidos na data do evento | P1 não tem refund/chargeback; rótulo `synthetic` |
 | 2026-11-21 | P2.1: orçamento v1 (as-of 2024-12-31) fixo, com erro proposital (crescimento +4% a.m., take rate sem mix) | Decisão do usuário; dá desvios a explicar no P2.4, rotulados sintéticos por construção |
 | 2026-11-21 | P2.1: sem MAPE; WAPE/Bias por razão de somas; Bias > 0 = superprevisão; Variance = actual − plan | Séries por merchant têm zeros |
+| 2026-11-21 | P2.2: mart sobre as tabelas core do P1 (mesma conexão DuckDB), arredondamento só no grão mais baixo | Reconciliação exata dia/mês/merchant/total e contra M07/M08 do P1 |
+| 2026-11-21 | P2.2: custo de processamento na data de criação do pagamento (regra do P1), não na da tentativa | R06 = M08 do P1; contrato F09 ajustado |
+| 2026-11-21 | P2.2: refund/chargeback sorteados por pagamento (XOR) com seed própria; refund = valor total; eventos após 2025-12-31 ficam fora do mart | Determinístico, sem dupla perda; censura à direita declarada |
+| 2026-11-21 | P2.2: orçamento v1 calibrado só com jan/2025 e congelado em `configs/budget_v1.yaml` com hash; `freeze` recusa sobrescrever | Plano fixo antes de T4 (R10); mudança só como v2 |
+| 2026-11-21 | P2.2: splits treino 01/01–31/07, validação 01/08–30/09 (= as-of), teste T4; lags ≥ horizonte, janelas deslocadas pelo horizonte | Previsão direta sem vazamento; teste de perturbação do futuro |
+| 2026-11-21 | P2.2: feriados por regra curada (fixos, Páscoa, n-ésima segunda), não calendário oficial completo | Sem dependência nova; marcado `[TO VERIFY]` |
