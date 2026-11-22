@@ -12,7 +12,7 @@ Rótulos: `observed` (nenhum no P2), `synthetic`, `derived`.
 | `dim_fx_rate` | taxa diária por moeda | synthetic | Conversão para BRL |
 | `manifest.json` | `seed`, hash | — | Rastreabilidade (versão dos dados) |
 
-## Tabelas do P2 (a criar no P2.2)
+## Tabelas do P2 (exportadas em `data/p2/`)
 | Tabela | Grão / chave | Campos principais | Rótulo |
 |---|---|---|---|
 | `fct_daily_merchant` | (`date_local`, `merchant_id`) | `tpv_brl`, `n_payments`, `fee_brl`, `proc_cost_brl`, `refund_brl`, `chargeback_brl`, `incentive_brl`, `var_cost_brl`, `net_revenue_brl`, `contribution_brl` | derived (+ synthetic) |
@@ -20,15 +20,19 @@ Rótulos: `observed` (nenhum no P2), `synthetic`, `derived`.
 | `fct_daily_total` | (`date_local`) | idem, agregado; `take_rate` | derived |
 | `fct_monthly` | (`month`, país) | idem | derived |
 | `dim_calendar` | `date_local` | dia da semana, feriado (país), flags de fim de mês/início de mês, dia útil | derived |
-| `ref_holiday` | (`country`, `date`) | nome, fonte | **fonte documentada obrigatória** (biblioteca/tabela pública); sem fonte, não entra |
-| `budget_v1` | (`month`, `country`) | `tpv_brl`, `take_rate`, `net_revenue`, `contribution`; `version`, `as_of`, `created_at`, `hash` | synthetic |
-| `assumptions_vN` | parâmetro | valor, `version`, `as_of` | synthetic |
-| `fct_forecast` | (`model`, `origin`, `date`, `horizon`, `metric`) | `yhat`, `lo80`, `hi80`, `lo95`, `hi95`, `config_hash` | derived |
-| `fct_backtest_metrics` | (`model`, `origin`, `horizon`, `metric`) | MAE, RMSE, WAPE, Bias, cobertura, runtime | derived |
+| `syn_adjustment` | (`payment_id`, `event_type`) | `merchant_id`, `method_code`, `event_date_local`, `amount_brl`, `fee_returned_brl`, `chargeback_fee_brl` (refund XOR chargeback por pagamento) | synthetic |
+| `budget_v1` | (`month`, `country`) | `tpv_brl`, `take_rate`, `fee_brl`, `net_revenue_brl`, `contribution_brl`, `version`, `as_of`; parâmetros e hash em `configs/budget_v1.yaml` | synthetic |
+| `budget_v2` | (`month`, `country`) | `tpv_brl`, `take_rate`, `fee_brl`, `rc_brl`, `inc_brl`, `proc_brl`, `var_brl`, `net_revenue_brl`, `contribution_brl`, `version`, `as_of`; parâmetros e hash em `configs/budget_v2.yaml` | synthetic |
+| `backtest/fct_backtest_forecast` | (`target`, `model`, `origin`, `step`) | `date`, `actual`, `yhat`, `lo80`, `hi80`, `lo95`, `hi95` (só datas ≤ as-of) | derived |
+| `backtest/fct_backtest_metrics` | (`target`, `model`, `horizon`) | `n_origins`, `mae`, `rmse`, `wape`, `bias`, `wape_sd_origins`, `window_sum_ape`, `cov80`, `cov95`, `width80`, `width95`, `sec_per_fit`, `n_failed_fits` | derived |
+| `backtest/fct_holdout_forecast` | (`target`, `model`, `step`) | previsão T4 de todos os modelos a partir do as-of; **não** usada para selecionar modelo | derived |
+| `backtest/fit_log` | (`target`, `model`, `origin`) | `seconds`, `failed`, `error`, `info` | derived |
+
+Premissas ficam em YAML versionado (`configs/assumptions.yaml`, `scenarios.yaml`, `alerts.yaml`, `backtest.yaml`), não em tabela. Feriados e eventos são colunas de `dim_calendar` (não há tabelas `ref_holiday`/`ref_events`).
 
 ## Regras de disponibilidade (anti-leakage)
 - Data `t` com origem `o` só usa dados com `date ≤ o`. Lags e médias móveis em dia `d` usam `d−k` com `k ≥ horizonte`, para previsão direta; para previsão recursiva, só o histórico até `o`.
-- Calendário (feriados, dia da semana) é conhecido com antecedência e pode ser usado no futuro. Eventos sintéticos só se declarados no `ref_events` **antes** da origem.
+- Calendário (feriados, dia da semana) é conhecido com antecedência e pode ser usado no futuro. Eventos (Black Friday/Cyber Monday) entram em `dim_calendar` por regra, conhecidos antes da origem.
 - Refunds e chargebacks de pagamentos até `o` que ocorrem depois de `o` **não** estão visíveis na origem `o` (usar data do evento).
 - `activation_date` é conhecido; merchants futuros não entram na previsão de merchant.
 - O orçamento v1 é conhecido em qualquer origem (as-of 2024-12-31).
@@ -38,7 +42,7 @@ Rótulos: `observed` (nenhum no P2), `synthetic`, `derived`.
 |---|---|---|
 | Dia da semana | sim, do P1 (curva de demanda) | sazonalidade semanal (período 7) |
 | Mês/ano | só 1 ciclo | sem sazonalidade anual; mês como feature só em ablação, com aviso |
-| Feriados BR/MX/CL | externos | fonte documentada; ver `ref_holiday` |
+| Feriados BR/MX/CL | externos | regras em `calendar.py`; colunas `holiday_*` de `dim_calendar` |
 | Entrada de merchants | `activation_date` | regressor de "merchants ativos"; tendência decomposta no P2.4 |
 | FX | série diária sintética | só como driver de desvio, não prevista |
 
@@ -54,4 +58,4 @@ Rótulos: `observed` (nenhum no P2), `synthetic`, `derived`.
 - Eventos de refund/chargeback fora da janela (depois de 2025-12-31) ficam em `syn_adjustment` e são contados no manifest, mas não entram no mart.
 - Feriados: conjunto curado por regra (datas fixas, Páscoa, n-ésima segunda); **não é calendário oficial completo** `[TO VERIFY]`. O gerador do P1 não modela feriados, então efeito de feriado deve dar ≈ 0.
 - Black Friday/Cyber Monday entram no calendário por regra (4ª sexta de novembro e +3 dias), conhecidos antes da origem.
-- `fct_forecast` e `fct_backtest_metrics` ficam para o P2.3.
+- Tabelas de previsão e backtest: ver `data/p2/backtest/` (P2.3).

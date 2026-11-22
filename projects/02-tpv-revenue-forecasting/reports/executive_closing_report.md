@@ -14,7 +14,7 @@ O TPV realizado foi 28,142,909: +53.0% em relação ao orçamento v1 (18,399,499
 *Previsão composta* = previsão do campeão de TPV por país × razões dos últimos 90 dias até o as-of (take rate, refund+chargeback/fee, custos/TPV). *Previsão direta* = campeão de cada alvo (P2.3). As duas diferem por construção; a ponte e os cenários usam a composta.
 
 ## 2. O que o as-of de 30/09 já sinalizava (alertas ex-ante)
-8 alertas vermelhos e 2 amarelos, com limites em `configs/alerts.yaml` (números redondos fixados antes de olhar o T4; não calibrados ao resultado).
+8 alertas vermelhos e 2 amarelos, com limites em `configs/alerts.yaml` (números redondos escolhidos depois de o holdout do P2.3 ter sido visto; não ajustados ao resultado).
 
 | alert | scope | value | amber | red | severity | evidence |
 |---|---|---|---|---|---|---|

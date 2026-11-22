@@ -4,7 +4,7 @@ Usage (app already running on :8502, e.g. ``python -m fintech_lab.p3_experiments
 
     python projects/03-experimentation-lab/app/a11y_audit.py [--url URL]
 
-Injects the vendored, hash-pinned ``assets/vendor/axe.min.js`` into each tab (and the SRM scenario)
+Injects the vendored, hash-pinned ``shared/vendor/axe.min.js`` into each tab (and the SRM scenario)
 via headless Edge/Chrome + CDP, and writes ``reports/a11y_axe.json`` and ``reports/a11y_axe.md``.
 This is an AUTOMATED check only: keyboard navigation and screen-reader behaviour stay [TO VERIFY].
 Nothing is sent outside the machine. Elements injected by browser extensions
@@ -31,7 +31,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 from capture_screenshots import BROWSERS, CDP, TABS  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
-AXE = ROOT / "assets" / "vendor" / "axe.min.js"
+AXE = Path(__file__).resolve().parents[3] / "shared" / "vendor" / "axe.min.js"
 AXE_SHA256 = "b511cd9dec01c76f4b2ad1723b66b6db37d4c2eb4ed199076e1829d9ee7b75e3"
 PORT = 9335
 RUN = (

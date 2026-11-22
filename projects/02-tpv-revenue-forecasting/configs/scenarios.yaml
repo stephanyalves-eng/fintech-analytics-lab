@@ -1,5 +1,6 @@
 # P2.4 business scenarios: ASSUMPTIONS, not statistical intervals. Values are round illustrative
-# choices fixed before the T4 comparison; they are NOT calibrated to cover the realized outcome.
+# choices made AFTER the P2.3 holdout results had been seen (git: f0e985c precedes this file); they
+# are NOT calibrated to cover the realized outcome.
 version: s1
 horizon: {start: "2025-10-01", end: "2025-12-31"}   # T4, 92 days
 ratios_window_days: 90          # driver ratios (take rate, cost/TPV, refund+chargeback/fee) from the last N days <= as_of

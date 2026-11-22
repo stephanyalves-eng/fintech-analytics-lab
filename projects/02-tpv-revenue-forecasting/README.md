@@ -29,7 +29,7 @@ never overwritten. The pipeline is idempotent: same inputs give the same tables 
 ## Headline (T4/2025, computed; see the report for definitions)
 Actual TPV was 53.0% above budget v1 and 25.7% above the forecast made at the 2025-09-30 cut-off; the
 contribution margin was 69.8% below budget v1. Budget v1's processing-cost and refund+chargeback
-assumptions were not calibrated to P1 (documented; v1 stays frozen). Budget v2 reduces the TPV error from
+assumptions were not calibrated to P1 (documented; v1 stays frozen). Budget v2 (numbers from data up to the cut-off only, but its rules were chosen after v1 failed, so not a blind pre-registration) reduces the TPV error from
 −34.6% to −17.1% and the margin error from +231.4% to −10.1%. One quarter of synthetic data is a case, not a statistic.
 
 ## Limits

@@ -1,4 +1,5 @@
-# P2.4 alert thresholds. Generic round numbers set before looking at the T4 outcome; edit freely.
+# P2.4 alert thresholds. Generic round numbers chosen AFTER the P2.3 holdout results had been seen
+# (git: f0e985c precedes this file); not tuned to the outcome. Edit freely.
 # Severity: amber when |value| >= amber, red when |value| >= red (for "min" rules: value <= threshold).
 version: a1
 rules:

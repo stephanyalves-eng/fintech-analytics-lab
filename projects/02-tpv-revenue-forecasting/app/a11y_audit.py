@@ -4,7 +4,7 @@ Usage (app on :8503)::
 
     python projects/02-tpv-revenue-forecasting/app/a11y_audit.py [--url URL]
 
-Injects the vendored, hash-pinned ``assets/vendor/axe.min.js`` into each tab via headless
+Injects the vendored, hash-pinned ``shared/vendor/axe.min.js`` into each tab via headless
 Edge/Chrome + CDP and writes ``reports/a11y_axe.json`` and ``reports/a11y_axe.md``. AUTOMATED only:
 keyboard navigation and screen-reader behaviour stay [TO VERIFY]. Elements injected by browser
 extensions (``deepl-input-controller``) are excluded.
@@ -40,7 +40,7 @@ RUN = (
 )
 
 ROOT = Path(__file__).resolve().parents[1]
-AXE = ROOT / "assets" / "vendor" / "axe.min.js"
+AXE = Path(__file__).resolve().parents[3] / "shared" / "vendor" / "axe.min.js"
 PORT = 9337
 
 

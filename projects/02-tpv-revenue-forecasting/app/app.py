@@ -316,7 +316,7 @@ with tabs[4]:
                                                           "actual")} | {"scenario vs base": "{:+.1%}"}),
                  hide_index=True)
     st.caption("TPV = merchants × payments/merchant × ticket (a product: interactions are "
-               "explicit). Scenario values were fixed before comparing with the realized quarter.")
+               "explicit). Scenario values are round assumptions chosen after the holdout was seen; not tuned to it.")
     st.markdown("### Statistical band (separate from the scenarios)")
     st.dataframe(CLS["band"][["metric", "champion", "n_origins", "implied_lo", "point", "implied_hi",
                             "actual", "actual_inside_band"]].style.format({
@@ -379,7 +379,7 @@ with tabs[6]:
             {"value": "{:+.3f}", "amber": "{:.2f}", "red": "{:.2f}"}), hide_index=True)
         download(a, key, f"dl_{key}")
     st.caption("Thresholds live in configs/alerts.yaml (edit and rerun `cli close`). Severity is "
-               "colour AND text. Generic round numbers set before looking at T4.")
+               "colour AND text. Generic round numbers chosen after the holdout was seen; not tuned to it.")
 
 # ---------------------------------------------------------------- About & export
 with tabs[7]:

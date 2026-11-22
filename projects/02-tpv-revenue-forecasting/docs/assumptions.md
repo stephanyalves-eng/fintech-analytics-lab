@@ -43,16 +43,20 @@ Regras:
 3. O erro proposital é declarado aqui e nos relatórios: todo desvio é **sintético por construção**, não evidência de gestão real.
 4. A calibração da base e do take rate por país fica para o P2.2, usando só jan/2025; este documento só fixa a regra.
 
-## E. Cenários (insumos para P2.4)
-| Cenário | Mudança | Base |
-|---|---|---|
-| Base | Previsão do champion | P2.3 |
-| Volume − | TPV −10% sobre o horizonte | sensibilidade, sem causalidade |
-| Take rate − | take rate −5% relativo | sensibilidade |
-| Refund/chargeback + | taxas ×1,5 | sensibilidade |
-| FX | FX em estresse ±10% nas moedas não-BRL | sensibilidade |
+## E. Cenários (implementados no P2.4)
+Definidos em `configs/scenarios.yaml` (variações relativas sobre 7 drivers; premissas de negócio, não intervalos). Base = previsão composta do campeão de TPV por país × razões dos últimos 90 dias até o as-of.
 
-São sensibilidades mecânicas, não previsões; rotuladas como tal.
+| Driver | Conservador | Base | Otimista |
+|---|---|---|---|
+| Merchants ativos | −3% | 0 | +3% |
+| Pagamentos por merchant | −5% | 0 | +5% |
+| Ticket médio | −2% | 0 | +2% |
+| Take rate | −3% | 0 | +3% |
+| Refund + chargeback / fee | +30% | 0 | −15% |
+| Custo de processamento / TPV | +10% | 0 | −5% |
+| Outros custos variáveis / TPV | +10% | 0 | −5% |
+
+TPV = merchants × pagamentos/merchant × ticket (produto; a interação é explícita). Sensibilidade: um driver por vez ±10%. Os valores são redondos e ilustrativos, escolhidos depois de o holdout do P2.3 ter sido visto, sem ajuste ao resultado. **O estresse de FX previsto na especificação original (±10% nas moedas não-BRL) não foi implementado**; o FX entra apenas na conversão para BRL dos valores realizados.
 
 ## F. Riscos conhecidos
 - Refund e chargeback são ruído sintético independente: não há correlação com risco, setor ou valor. Conclusões sobre sua previsibilidade não valem para dado real.

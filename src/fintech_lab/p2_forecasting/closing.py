@@ -302,7 +302,7 @@ O TPV realizado foi {tpv.actual:,.0f}: {tpv.actual_vs_budget_pct:+.1%} em relaç
 *Previsão composta* = previsão do campeão de TPV por país × razões dos últimos {scen_cfg["ratios_window_days"]} dias até o as-of (take rate, refund+chargeback/fee, custos/TPV). *Previsão direta* = campeão de cada alvo (P2.3). As duas diferem por construção; a ponte e os cenários usam a composta.
 
 ## 2. O que o as-of de 30/09 já sinalizava (alertas ex-ante)
-{n_red} alertas vermelhos e {n_amb} amarelos, com limites em `configs/alerts.yaml` (números redondos fixados antes de olhar o T4; não calibrados ao resultado).
+{n_red} alertas vermelhos e {n_amb} amarelos, com limites em `configs/alerts.yaml` (números redondos escolhidos depois de o holdout do P2.3 ter sido visto; não ajustados ao resultado).
 
 {md_table(o["alerts_ex_ante"][o["alerts_ex_ante"]["severity"].isin(["red", "amber"])], pct=("value", "amber", "red"))}
 
