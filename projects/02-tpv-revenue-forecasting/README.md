@@ -11,6 +11,7 @@ python -m fintech_lab.p1_payments.cli generate          # P1 data (once)
 python -m fintech_lab.p2_forecasting.cli pipeline       # mart -> backtest -> holdout -> budget v2 -> close
 python -m fintech_lab.p2_forecasting.cli dashboard      # Streamlit cockpit on :8503 (runs the pipeline if needed)
 python -m fintech_lab.p2_forecasting.cli audit          # independent recompute from raw P1 -> reports/audit_p2.md
+python -m fintech_lab.p2_forecasting.cli sensitivity    # bootstrap check of the champion rule (informational)
 pytest -q tests/p2
 ```
 Frozen artifacts (`configs/budget_v1.yaml`, `budget_v2.yaml`, `champions_b1.yaml`) are verified and reused,

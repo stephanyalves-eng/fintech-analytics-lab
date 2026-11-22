@@ -90,4 +90,9 @@ def write_reports(results: list[dict]) -> None:
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--url", default="http://localhost:8503")
-    write_reports(asyncio.run(audit(ap.parse_args().url)))
+    ap.add_argument("--strict", action="store_true", help="exit 1 if any violation is found")
+    args = ap.parse_args()
+    results = asyncio.run(audit(args.url))
+    write_reports(results)
+    if args.strict and any(r["violations"] for r in results):
+        raise SystemExit(1)

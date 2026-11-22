@@ -1,0 +1,19 @@
+target,complex,baseline,method,delta_point,se,ci95_lo,ci95_hi,p_delta_negative,complex_wins_by_rule,frozen_champion,frozen_decision_is_complex,same_decision_as_frozen
+contribution_total,sarima,ma7,analytic (frozen rule),0.03337066681268149,,,,,False,ma7,False,True
+contribution_total,sarima,ma7,bootstrap iid,0.03337066681268149,0.0151062480833111,0.005795235131859601,0.06462484886509609,0.008,False,ma7,False,True
+contribution_total,sarima,ma7,bootstrap block=4,0.03337066681268149,0.01720261494224373,0.000124289026895856,0.06771973259203541,0.024,False,ma7,False,True
+net_revenue_total,sarima,ma7,analytic (frozen rule),-0.021890264511345032,0.003309556252349728,,,,True,sarima,True,True
+net_revenue_total,sarima,ma7,bootstrap iid,-0.021890264511345032,0.0031992942713500202,-0.02805297429764971,-0.015391593251075197,1.0,True,sarima,True,True
+net_revenue_total,sarima,ma7,bootstrap block=4,-0.021890264511345032,0.0037154401028257392,-0.029220017820271678,-0.014805124972326715,1.0,True,sarima,True,True
+tpv_BR,sarima,ma7,analytic (frozen rule),-0.0288594832486322,0.0023958408178625314,,,,True,sarima,True,True
+tpv_BR,sarima,ma7,bootstrap iid,-0.0288594832486322,0.002325679468575787,-0.03358770715516869,-0.02442666135051378,1.0,True,sarima,True,True
+tpv_BR,sarima,ma7,bootstrap block=4,-0.0288594832486322,0.0022776456580234526,-0.03318806282246082,-0.024265142700373096,1.0,True,sarima,True,True
+tpv_CL,sarima,ma28,analytic (frozen rule),-0.00494943049227634,0.002566454649354359,,,,True,sarima,True,True
+tpv_CL,sarima,ma28,bootstrap iid,-0.00494943049227634,0.0025078754787520655,-0.00971569030227553,0.00011206231542253921,0.9722,True,sarima,True,True
+tpv_CL,sarima,ma28,bootstrap block=4,-0.00494943049227634,0.003106556507805771,-0.011081909135910116,0.0010326829761477905,0.9446,True,sarima,True,True
+tpv_MX,sarima,ma7,analytic (frozen rule),-0.020521890236116693,0.004319331935582353,,,,True,sarima,True,True
+tpv_MX,sarima,ma7,bootstrap iid,-0.020521890236116693,0.004243995046859429,-0.029434965969138454,-0.012657872535099082,1.0,True,sarima,True,True
+tpv_MX,sarima,ma7,bootstrap block=4,-0.020521890236116693,0.003918204931473061,-0.028097893830533197,-0.012939678905859894,1.0,True,sarima,True,True
+tpv_total,sarima,snaive,analytic (frozen rule),-0.029659097724208477,0.0026417496815950674,,,,True,sarima,True,True
+tpv_total,sarima,snaive,bootstrap iid,-0.029659097724208477,0.00253648865397534,-0.0345711581577473,-0.02452206820509534,1.0,True,sarima,True,True
+tpv_total,sarima,snaive,bootstrap block=4,-0.029659097724208477,0.00298610817166553,-0.03490098535295321,-0.02337825946351909,1.0,True,sarima,True,True

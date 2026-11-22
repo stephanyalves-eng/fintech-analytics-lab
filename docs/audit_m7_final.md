@@ -86,3 +86,11 @@ O repositório foi publicado e o CI rodou no GitHub Actions (ubuntu, Python 3.12
 
 **M4 fechado.** Continuam abertos: teclado humano e leitor de tela, tema escuro, L8 (mantido de propósito), os scripts de captura/teclado que exigem navegador (não rodam no CI) e a varredura de vulnerabilidades repetida antes de cada publicação.
 
+## Itens em aberto — andamento (2026-11-22)
+| Item | Situação |
+|---|---|
+| L8 · estatística aproximada | Quantificada, sem mudar a regra: bootstrap pareado (iid e blocos) mantém as 18 decisões; `tpv_CL` é frágil (IC 95% inclui zero). Ver `docs/methods.md` e `reports/champion_sensitivity.md` |
+| Scripts com navegador fora do CI | Passaram a rodar no CI (Chrome do ubuntu-latest): teste de teclado `--strict` nos 3 dashboards e axe `--strict` em P2 e P3 |
+| Varredura de vulnerabilidades | `pip-audit` agora roda a cada CI sobre o lock |
+| Teclado humano e leitor de tela | **Não executável pelo assistente.** Roteiro em `docs/manual_accessibility_checklist.md` com tabela de registro vazia |
+| Tema escuro | **Não implementado de propósito** (tokens de design provisórios); condição para reabrir descrita no roteiro manual |

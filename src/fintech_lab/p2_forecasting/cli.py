@@ -188,6 +188,37 @@ def _budget_v2(a: argparse.Namespace) -> int:
     return 0
 
 
+def _sensitivity(a: argparse.Namespace) -> int:
+    from fintech_lab.p2_forecasting import backtest as bt
+    from fintech_lab.p2_forecasting import champion_sensitivity as cs
+    from fintech_lab.p2_forecasting.reporting import md_table
+
+    cfg = bt.load_cfg(a.config)
+    bdir = Path(a.out) / "backtest"
+    fc = pd.read_parquet(bdir / "fct_backtest_forecast.parquet")
+    summ = pd.read_parquet(bdir / "fct_backtest_metrics.parquet")
+    res = cs.run(fc, bt.select_champions(fc, summ, cfg), cfg)
+    rep = Path(a.reports)
+    rep.mkdir(parents=True, exist_ok=True)
+    res.to_csv(rep / "champion_sensitivity.csv", index=False)
+    changed = res[~res["same_decision_as_frozen"]]
+    head = (
+        "# Champion rule: post-hoc sensitivity (informational; nothing frozen changes)\n\n"
+        "The frozen rule uses an approximate paired standard error. The same paired differences "
+        "(validation only, never the holdout) are resampled by bootstrap (iid and circular blocks "
+        "of 4 origins) to check whether each complex-vs-baseline decision is robust. "
+        "`delta_point` < 0 means the complex model has the lower composite WAPE.\n\n"
+    )
+    cols = ["target", "complex", "baseline", "method", "delta_point", "se", "ci95_lo", "ci95_hi",
+            "p_delta_negative", "complex_wins_by_rule", "same_decision_as_frozen"]
+    names = ", ".join(f"{r.target} ({r.method})" for r in changed.itertuples()) or "none"
+    note = f"\n\nDecisions that differ from the frozen ones: {names}.\n"
+    (rep / "champion_sensitivity.md").write_text(
+        head + md_table(res[cols], digits=4) + note, encoding="utf-8")
+    print(f"{len(res)} rows; decisions differing from frozen: {len(changed)}")
+    return 0
+
+
 def _close(a: argparse.Namespace) -> int:
     import yaml
 
@@ -278,6 +309,11 @@ def main(argv: list[str] | None = None) -> int:
         if name == "backtest":
             q.add_argument("--workers", type=int, default=1)
             q.add_argument("--freeze", action="store_true")
+    se = sub.add_parser("sensitivity")
+    se.add_argument("--config", default=str(DEFAULT_BACKTEST))
+    se.add_argument("--out", default=str(DEFAULT_OUT))
+    se.add_argument("--reports", default=str(REPORTS))
+    se.set_defaults(fn=_sensitivity)
     for name, fn in (("pipeline", _pipeline), ("dashboard", _dashboard)):
         q = sub.add_parser(name)
         q.add_argument("--out", default=str(DEFAULT_OUT))

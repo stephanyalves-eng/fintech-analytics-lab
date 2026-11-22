@@ -111,9 +111,10 @@ async def open_page(port: int, tag: str):
     if exe is None:
         raise SystemExit("No Edge/Chrome/Chromium found (set FAL_BROWSER to its path)")
     profile = tempfile.mkdtemp(prefix=f"{tag}_")
+    extra = ["--no-sandbox"] if os.environ.get("CI") or os.environ.get("FAL_NO_SANDBOX") else []
     proc = subprocess.Popen(
         [exe, "--headless=new", f"--remote-debugging-port={port}", f"--user-data-dir={profile}",
-         "--hide-scrollbars", "--force-color-profile=srgb", "about:blank"],
+         "--hide-scrollbars", "--force-color-profile=srgb", *extra, "about:blank"],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
     for _ in range(50):
         try:

@@ -61,3 +61,5 @@
 | 2026-11-21 | M7: alegações de "fixado antes do T4" reescritas; docs do P2 alinhados ao código (FX não implementado); axe-core em cópia única `shared/vendor` com `THIRD_PARTY_NOTICES.md` | Auditoria final: história do git não sustentava o pré-registro; licença MPL sem aviso |
 | 2026-11-21 | M7 baixos: check de data de settlement (c14) e defeito injetado; memo do P1 sem data de execução; CDP compartilhado em `shared/browser_cdp.py`; teste de teclado automatizado; `eol=lf`; `sec_per_fit` só no parquet | Fechar os baixos da auditoria que não dependem de publicação |
 | 2026-11-21 | M7 L8: regra de seleção do campeão (EP pareado aproximado) mantida | Alterá-la após ver o holdout seria ajuste pós-hoc |
+| 2026-11-22 | Sensibilidade pós-hoc do campeão por bootstrap (só validação), sem alterar a regra congelada | Quantifica a aproximação do EP pareado sem ajuste pós-hoc; `tpv_CL` fica registrado como frágil |
+| 2026-11-22 | CI passa a rodar `pip-audit`, teste de teclado e axe nos dashboards (`--strict`); tema escuro adiado | Fechar o que é automatizável; tema escuro depende do design system |

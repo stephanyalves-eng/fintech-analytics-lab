@@ -158,7 +158,12 @@ if __name__ == "__main__":
     ap.add_argument("--out", required=True)
     ap.add_argument("--name", default="dashboard")
     ap.add_argument("--port", type=int, default=9338)
+    ap.add_argument("--strict", action="store_true",
+                    help="exit 1 on a keyboard trap, a zero-size stop or broken arrow navigation")
     a = ap.parse_args()
     r = asyncio.run(smoke(a.url, a.port))
     write_report(r, Path(a.out), a.name)
     print(json.dumps({k: v for k, v in r.items() if k != "first_stops"}, indent=2))
+    if a.strict and (r["max_consecutive_same_focus"] >= TRAP_LIMIT or r["zero_size_stops"]
+                     or r["tab_arrow_navigation"] is False):
+        raise SystemExit(1)

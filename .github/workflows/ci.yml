@@ -31,3 +31,23 @@ jobs:
       - run: python -m fintech_lab.p3_experiments.cli verify
       - run: python -m fintech_lab.p3_experiments.cli generate
       - run: python -m fintech_lab.p3_experiments.cli analyze
+      # Known-vulnerability scan of the pinned dependencies (names and versions only leave the runner).
+      - run: python -m pip install pip-audit
+      - run: python -m pip_audit -r requirements-lock.txt --no-deps --disable-pip --progress-spinner off
+      # Browser QA on the three running dashboards (Chrome is preinstalled on ubuntu-latest).
+      - name: Start dashboards
+        run: |
+          nohup python -m fintech_lab.p1_payments.cli dashboard --port 8501 > p1.log 2>&1 &
+          nohup python -m fintech_lab.p3_experiments.cli dashboard --port 8502 > p3.log 2>&1 &
+          nohup python -m fintech_lab.p2_forecasting.cli dashboard --port 8503 > p2.log 2>&1 &
+          for p in 8501 8502 8503; do
+            for i in $(seq 1 120); do curl -sf http://localhost:$p/_stcore/health && break; sleep 1; done
+            curl -sf http://localhost:$p/_stcore/health
+          done
+      - run: python -m fintech_lab.shared.keyboard_smoke --url http://localhost:8501 --out /tmp/kb_p1.md --name p1 --port 9338 --strict
+      - run: python -m fintech_lab.shared.keyboard_smoke --url http://localhost:8502 --out /tmp/kb_p3.md --name p3 --port 9339 --strict
+      - run: python -m fintech_lab.shared.keyboard_smoke --url http://localhost:8503 --out /tmp/kb_p2.md --name p2 --port 9340 --strict
+      - run: python projects/03-experimentation-lab/app/a11y_audit.py --url http://localhost:8502 --strict
+      - run: python projects/02-tpv-revenue-forecasting/app/a11y_audit.py --url http://localhost:8503 --strict
+      - if: failure()
+        run: tail -n 40 p1.log p2.log p3.log
