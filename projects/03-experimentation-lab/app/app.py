@@ -36,6 +36,8 @@ st.markdown(
     .synthetic-badge {{ display:inline-block; padding:2px 10px; border-radius:999px;
         background:{C["surface"]}; color:{C["text"]}; border:1px solid {C["muted"]};
         font-size:0.8rem; font-weight:600; }}
+    [data-testid="stCaptionContainer"], [data-testid="stCaptionContainer"] p {{
+        color:{C["muted"]} !important; opacity:1 !important; }}
     div[data-testid="stMetric"] {{ background:{C["surface"]}; border-radius:8px; padding:10px 14px; }}
     </style>""",
     unsafe_allow_html=True,
@@ -227,6 +229,9 @@ with tabs[6]:
     k[2].metric("Year-1 net of assumed cost", f"R$ {ec['year1_net']:,.0f}")
     st.markdown("#### Exploratory segments (no multiplicity control; never used to decide)")
     seg = res["segments"]
-    st.dataframe(seg, width="stretch", hide_index=True) if len(seg) else st.caption("No segments.")
+    if len(seg):
+        st.dataframe(seg, width="stretch", hide_index=True)
+    else:
+        st.caption("No segments.")
     st.caption("Limitations: ITT effect on the simulated population only; chargeback maturation of "
                "30 d is short; interference assumed negligible; no external validity.")  # fmt: skip

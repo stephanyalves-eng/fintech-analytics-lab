@@ -1,0 +1,50 @@
+[
+  {
+    "view": "positive/overview_protocol",
+    "violations": [],
+    "passes": 28,
+    "incomplete": 1
+  },
+  {
+    "view": "positive/funnel",
+    "violations": [],
+    "passes": 26,
+    "incomplete": 1
+  },
+  {
+    "view": "positive/results",
+    "violations": [],
+    "passes": 25,
+    "incomplete": 1
+  },
+  {
+    "view": "positive/guardrails",
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1
+  },
+  {
+    "view": "positive/data_quality",
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1
+  },
+  {
+    "view": "positive/sensitivity_monte_carlo",
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1
+  },
+  {
+    "view": "positive/decision",
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1
+  },
+  {
+    "view": "srm/data_quality",
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1
+  }
+]

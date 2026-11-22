@@ -20,3 +20,4 @@ python -m fintech_lab.p3_experiments.cli dashboard   # http://localhost:8502
 - Intervalo que inclui zero não é "sem efeito". Guardrail `undetermined` não é segurança.
 - A decisão vem só do protocolo travado; economia e segmentos não a alteram.
 - Ressalvas medidas (ver methods.md): o G2 tem erro tipo I de 0,028 (leve excesso) e o G4 tem poder de só 0,35, o que limita a chance real de "Launch".
+- Acessibilidade: auditoria automática com axe-core (0 violações nas 7 abas e no cenário SRM; 1 item `incomplete` por tela para revisão manual) em `reports/a11y_axe.md`. Teclado e leitor de tela não foram testados manualmente [TO VERIFY].
