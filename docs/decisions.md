@@ -35,3 +35,8 @@
 | 2026-11-21 | P3: Ruff ignora E501 em `p3_experiments` e no app P3 | Literais densos com `# fmt: skip` |
 | 2026-11-21 | P3: G4 (poder 0,35 sem degradação) e G2 (tipo I 0,028) ficam documentados, sem emenda ao protocolo | Decisão do usuário: só documentar; n, margem e método do intervalo permanecem como travados |
 | 2026-11-21 | Auditoria P3: usuário com trilha incompleta não conta como conversão; análise exige `observation_end` ≥ dia 65 | Alinhar o código ao protocolo §7.3 e à regra de data de análise, sem emenda ao protocolo |
+| 2026-11-21 | P2.1: só dados do P1 (Olist fora do MVP); TPV = M07 do P1; receita por data de criação local (accrual) | Um único TPV; evita reinterpretar dado público como PSP |
+| 2026-11-21 | P2.1: cut-off/as-of 2025-09-30, horizonte T4/2025 (92 d), backtest 7/30/90 d; jan/2026 excluído (fuso) | Decisão do usuário; T4 tem realizado para avaliar |
+| 2026-11-21 | P2.1: refund, chargeback, incentivo e custo variável sintéticos e determinísticos, reconhecidos na data do evento | P1 não tem refund/chargeback; rótulo `synthetic` |
+| 2026-11-21 | P2.1: orçamento v1 (as-of 2024-12-31) fixo, com erro proposital (crescimento +4% a.m., take rate sem mix) | Decisão do usuário; dá desvios a explicar no P2.4, rotulados sintéticos por construção |
+| 2026-11-21 | P2.1: sem MAPE; WAPE/Bias por razão de somas; Bias > 0 = superprevisão; Variance = actual − plan | Séries por merchant têm zeros |

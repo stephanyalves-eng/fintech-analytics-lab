@@ -5,14 +5,14 @@
 | M0 setup comum | concluído (sem commit) | ruff ok; pytest 6 passed (py3.12) |
 | M1 P1 dados e SQL | concluído (P1.1–P1.3) | pytest 42 passed; `cli check` 18/18 PASS em 500k tentativas |
 | M2 P1 dashboard | concluído (P1.4–P1.5) | pytest 59 passed; ruff ok; 7 screenshots reais; 2M tentativas: consultas ≤ 62 ms |
-| M3 P2 dados e modelos | pendente | |
+| M3 P2 dados e modelos | em andamento (P2.1 feito) | ver log P2.1 |
 | M4 P2 dashboard | pendente | |
 | M5 P3 protocolo e simulação | concluído (P3.1–P3.2) | ver log P3.2 |
 | M6 P3 análise e dashboard | concluído (P3.3–P3.5) | ver log P3.3–P3.5 |
 | M7 auditoria/publicação | pendente | |
 
 ## Próximo passo
-P2.1 (desenho do forecasting) ou auditoria independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
+P2.2 (dataset analítico, calibrar base do orçamento só com jan/2025) ou auditoria independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
 
 ## Log
 - 2026-11-21 M0: estrutura do monorepo, pyproject, ruff, pytest e CI criados.
@@ -32,3 +32,4 @@ P2.1 (desenho do forecasting) ou auditoria independente do P3 (M7). Pendências 
 - 2026-11-21 P3 a11y: axe-core 4.10.2 (vendored, SHA-256 fixado) nas 7 abas + cenário SRM (`app/a11y_audit.py`, `reports/a11y_axe.md`). Corrigido: contraste das legendas (cor `muted` + opacity 1) e `st.dataframe` solto que renderizava `stHelpDoc`; `deepl-input-controller` (extensão do navegador) excluído. Resultado: 0 violações automáticas, 1 item `incomplete` por tela para revisão manual. Teclado e leitor de tela seguem [TO VERIFY].
 - 2026-11-21 Auditoria P3 (só relatório, nada corrigido): recálculo independente em DuckDB bate nos 5 cenários (P01, SRM, G1–G5); hash determinístico; protocolo travado inalterado desde o P3.1; IC cobre o efeito analítico verdadeiro nos 3 cenários válidos. Achados: M1 protocolo §7.3 diz que trilha incompleta não conta como conversão, mas o código conta (2.118 de 2.194 no cenário `missing`); L1 data de análise/maturação de 30 d não é imposta; L2 aba Results sem aviso quando o resultado é INVALID; L3 `decide()` sem teste unitário com entradas sintéticas.
 - 2026-11-21 Remediação auditoria P3 (M1, L1–L3): trilha incompleta não conta como conversão (protocolo §7.3); `observation_end` no manifest e análise recusa dados imaturos; aviso INVALID em 4 abas; testes unitários de `decide()` (ordem e bordas). Relatórios regenerados: só `missing` mudou (P01 −3,44 p.p., INVALID). Screenshots e auditoria axe não refeitos (valid scenarios inalterados; banners novos só em INVALID).
+- 2026-11-21 P2.1: plano aprovado (cut-off 2025-09-30; orçamento com erro proposital). Criados em `projects/02-tpv-revenue-forecasting/docs/`: problem_statement, metric_contracts (F01–F12, E01–E07, R01–R10), assumptions (refund/chargeback/orçamento v1/cenários) e data_dictionary (anti-leakage). Sem código; todos os valores de premissa são propostas sintéticas ainda não calibradas.
