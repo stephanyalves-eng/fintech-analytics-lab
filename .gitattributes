@@ -1,0 +1,4 @@
+# Keep vendored/binary files byte-exact (the axe hash is pinned in a11y_audit.py)
+projects/03-experimentation-lab/assets/vendor/axe.min.js -text
+*.png binary
+*.parquet binary
