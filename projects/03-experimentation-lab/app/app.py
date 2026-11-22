@@ -83,10 +83,16 @@ if not (DATA_ROOT / scenario / "manifest.json").exists():
              "Run `python -m fintech_lab.p3_experiments.cli generate`.")  # fmt: skip
     st.stop()
 
-res = analysis(str(DATA_ROOT), scenario)
+try:
+    res = analysis(str(DATA_ROOT), scenario)
+except ValueError as e:  # e.g. DataNotMatureError: never show effects on censored data
+    st.error(f"Analysis refused: {e}")
+    st.stop()
 proto = protocol()
 m, cnt, g, p, dec = res["meta"], res["counts"], res["gates"], res["primary"], res["decision"]
 
+INVALID_NOTE = ("Result is INVALID (a validity gate failed): the numbers on this tab are shown for "
+                "transparency only and must not be interpreted as an effect.")  # fmt: skip
 tabs = st.tabs(["Overview & protocol", "Funnel", "Results", "Guardrails", "Data quality",
                 "Sensitivity & Monte Carlo", "Decision"])  # fmt: skip
 
@@ -138,6 +144,8 @@ with tabs[1]:
                "pre-fraud-blocked users before exposure.")  # fmt: skip
 
 with tabs[2]:
+    if not g["all_pass"]:
+        st.warning(INVALID_NOTE)
     k = st.columns(4)
     k[0].metric("P01 arm A", f"{p['p_a']:.2%}", help="Exposed users with ≥1 approval within 7 d ÷ exposed users")  # fmt: skip
     k[1].metric("P01 arm B", f"{p['p_b']:.2%}")
@@ -157,6 +165,8 @@ with tabs[2]:
     st.info("A confidence interval that includes 0 is **not** evidence of no effect.")
 
 with tabs[3]:
+    if not g["all_pass"]:
+        st.warning(INVALID_NOTE)
     gr = pd.DataFrame(res["guardrails"])
     gr["d / margin"] = gr["diff"] / gr["margin"]
     gr["lo / margin"] = gr["ci_low"] / gr["margin"]
@@ -196,6 +206,8 @@ with tabs[4]:
                  "result is INVALID and must not be interpreted.")  # fmt: skip
 
 with tabs[5]:
+    if not g["all_pass"]:
+        st.warning(INVALID_NOTE)
     sv = res["sensitivity"]
     st.markdown("**Non-decisional checks of P01**")
     st.table(pd.DataFrame([
@@ -216,6 +228,8 @@ with tabs[5]:
         st.info("Run `python -m fintech_lab.p3_experiments.cli montecarlo` to produce this table.")
 
 with tabs[6]:
+    if not g["all_pass"]:
+        st.warning(INVALID_NOTE)
     st.markdown(f"### {dec['decision']}  ·  {dec['rule']}")
     for r in dec["reasons"]:
         st.markdown(f"- {r}")

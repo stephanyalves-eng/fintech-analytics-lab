@@ -186,7 +186,12 @@ def write_scenario(scenario: str, out_root: Path = DATA_ROOT, **kw: Any) -> Path
     events.to_parquet(out / "events.parquet", index=False)
     (out / "truth.json").write_text(json.dumps(truth, indent=2) + "\n", encoding="utf-8")
     protocol = load_protocol()
+    cfg = load_sim_config()
+    w = protocol["windows_days"]
+    observation_end = np.datetime64(cfg["population"]["start_date"], "s") + np.timedelta64(
+        cfg["population"]["enrollment_days"] + w["conversion"] + w["chargeback_maturation"], "D")
     manifest = {
+        "observation_end": str(observation_end),
         "data_origin": DataOrigin.SYNTHETIC.value,
         "scenario": scenario,
         "experiment_id": protocol["experiment"]["id"],

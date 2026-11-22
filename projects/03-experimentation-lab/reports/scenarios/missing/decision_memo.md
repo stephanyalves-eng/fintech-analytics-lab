@@ -12,10 +12,10 @@
 - Trilhas incompletas: A 0.73%, B 7.64% → FALHOU
 
 ## Métrica primária P01 (conversão do usuário em 7 d, grão usuário, ITT)
-- A 60.47% (n=26498) · B 63.71% (n=26203)
-- Diferença +3.23 p.p., IC 95% [+2.41 p.p., +4.06 p.p.], p=2e-14
-- Relativa +5.35% [+3.95%, +6.76%]
-- MDE de desenho no n observado: +1.19 p.p. (não é poder observado)
+- A 59.77% (n=26498) · B 56.33% (n=26203)
+- Diferença -3.44 p.p., IC 95% [-4.29 p.p., -2.60 p.p.], p=1.119e-15
+- Relativa -5.76% [-7.12%, -4.38%]
+- MDE de desenho no n observado: +1.20 p.p. (não é poder observado)
 
 ## Guardrails (não inferioridade; d = B − A, maior é pior)
 | ID | Métrica | A | B | d | IC 95% | Margem | Status |
@@ -28,7 +28,7 @@
 
 ## Sensibilidade (não decisória)
 - Excluindo 2194 usuários com trilha incompleta: +0.77 p.p. [-0.08 p.p., +1.63 p.p.]
-- Erro-padrão robusto HC1: +3.23 p.p. [+2.41 p.p., +4.06 p.p.]
+- Erro-padrão robusto HC1: -3.44 p.p. [-4.29 p.p., -2.60 p.p.]
 
 ## Economia HIPOTÉTICA
 - Valor por usuário: A R$ -0.73 · B R$ -0.41 · Δ R$ +0.320 [+0.021, +0.619]
@@ -39,13 +39,13 @@
 ## Segmentos (exploratórios, sem correção de multiplicidade, não decidem nada)
 | Segmento | Nível | n A | n B | Δ | IC 95% |
 |---|---|---|---|---|---|
-| card_type | credit_card | 18572 | 18374 | +3.80 p.p. | [+2.81 p.p., +4.79 p.p.] |
-| card_type | debit_card | 7926 | 7829 | +1.91 p.p. | [+0.39 p.p., +3.42 p.p.] |
-| new_vs_returning_user | new | 16013 | 15710 | +3.27 p.p. | [+2.21 p.p., +4.34 p.p.] |
-| new_vs_returning_user | returning | 10485 | 10493 | +3.18 p.p. | [+1.86 p.p., +4.49 p.p.] |
-| ticket_band | high | 6940 | 6792 | +2.18 p.p. | [+0.55 p.p., +3.80 p.p.] |
-| ticket_band | low | 6044 | 6041 | +3.03 p.p. | [+1.30 p.p., +4.75 p.p.] |
-| ticket_band | mid | 13514 | 13370 | +3.86 p.p. | [+2.70 p.p., +5.02 p.p.] |
+| card_type | credit_card | 18572 | 18374 | -2.70 p.p. | [-3.70 p.p., -1.69 p.p.] |
+| card_type | debit_card | 7926 | 7829 | -5.20 p.p. | [-6.74 p.p., -3.66 p.p.] |
+| new_vs_returning_user | new | 16013 | 15710 | -3.57 p.p. | [-4.65 p.p., -2.48 p.p.] |
+| new_vs_returning_user | returning | 10485 | 10493 | -3.26 p.p. | [-4.59 p.p., -1.92 p.p.] |
+| ticket_band | high | 6940 | 6792 | -4.42 p.p. | [-6.07 p.p., -2.77 p.p.] |
+| ticket_band | low | 6044 | 6041 | -3.73 p.p. | [-5.48 p.p., -1.97 p.p.] |
+| ticket_band | mid | 13514 | 13370 | -2.82 p.p. | [-4.00 p.p., -1.64 p.p.] |
 
 ## Limitações
 - Efeito ITT de oferecer B, na população simulada (BR, cartão); sem validade externa.

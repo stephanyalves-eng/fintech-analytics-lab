@@ -41,6 +41,11 @@ Usa os mesmos estimadores da análise sobre usuários simulados diretamente, com
 - O poder de G1 (0,87) e o conjunto (0,87) superam a aproximação do protocolo porque o design effect de 1,2 é conservador para este simulador: o design effect observado em G1 e G2 nos cenários é ≈ 1,0 (`results.json`). Isso vale **por construção** (as tentativas de um usuário são independentes no simulador) e **não** valida nem refuta o 1,2 para dados reais.
 - O texto de `protocol.md` ainda diz "G3/G4 [TO VERIFY]". Ele está travado e não foi editado; esta seção o substitui como registro do que foi verificado.
 
+## Conformidade com o protocolo (auditoria)
+- **Trilhas incompletas (§7.3):** usuários com trilha incompleta ficam no denominador e **não contam como conversão** (`converted = aprovação registrada e trilha completa`). A versão anterior contava; isso foi corrigido e o cenário `missing` regenerado (o sinal do P01 nesse cenário muda, mas o resultado é INVALID de qualquer forma).
+- **Data de análise (dia 65):** o manifest agora registra `observation_end` e a análise recusa (`DataNotMatureError`) dados observados antes de última exposição + 7 d + 30 d, ou sem esse campo. Isso evita chargeback e conversão censurados sem aviso.
+- **Resultado INVALID no dashboard:** as abas Results, Guardrails, Sensitivity e Decision mostram um aviso de que os números não devem ser interpretados.
+
 ## Decisão e economia (P3.4)
 `decision.py` aplica a ordem INVALID → DO NOT LAUNCH → LAUNCH → INCONCLUSIVE. `economics.py` usa premissas hipotéticas (`configs/economics.yaml`, fora do lock) e **não altera** a decisão. Segmentos são exploratórios.
 

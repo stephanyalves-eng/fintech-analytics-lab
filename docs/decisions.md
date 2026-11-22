@@ -34,3 +34,4 @@
 | 2026-11-21 | P3.4: economia hipotética em `economics.yaml`, fora do lock, sem efeito na decisão | O protocolo define a regra; economia só informa |
 | 2026-11-21 | P3: Ruff ignora E501 em `p3_experiments` e no app P3 | Literais densos com `# fmt: skip` |
 | 2026-11-21 | P3: G4 (poder 0,35 sem degradação) e G2 (tipo I 0,028) ficam documentados, sem emenda ao protocolo | Decisão do usuário: só documentar; n, margem e método do intervalo permanecem como travados |
+| 2026-11-21 | Auditoria P3: usuário com trilha incompleta não conta como conversão; análise exige `observation_end` ≥ dia 65 | Alinhar o código ao protocolo §7.3 e à regra de data de análise, sem emenda ao protocolo |

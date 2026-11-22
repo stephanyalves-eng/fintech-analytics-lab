@@ -32,8 +32,12 @@ def test_scenarios_render(data_root, monkeypatch, scenario):
     assert len(at.tabs) == 7
     assert any("SYNTHETIC" in md.value for md in at.markdown)
     text = " ".join(md.value for md in at.markdown)
+    warned = [w for w in at.warning if "INVALID" in w.value]
     if invalid:
         assert "INVALID" in text and "validity gate failed" in at.error[0].value
+        assert len(warned) == 4  # Results, Guardrails, Sensitivity, Decision tabs
+    else:
+        assert not warned
 
 
 def test_missing_data_error_state(tmp_path, monkeypatch):

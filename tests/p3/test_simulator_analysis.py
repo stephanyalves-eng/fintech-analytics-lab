@@ -191,3 +191,59 @@ def test_monte_carlo_runs_and_reports_se():
     for k in ("P01", "G1", "G2", "G3", "G4", "G5", "Joint"):
         assert k in ids
     assert all(0 <= r["rate"] <= 1 and r["mc_se"] >= 0 for r in rows)
+
+
+# ---------------------------------------------------------------- audit remediation (M1, L1, L3)
+def test_incomplete_trails_do_not_count_as_conversions(sims, protocol):
+    """Protocol 7.3: incomplete-trail users stay in the denominator but are not conversions."""
+    users, events, _ = sims["missing"]
+    f = an.build_frames(users, events, protocol)["users"]
+    inc = f[f["incomplete"]]
+    assert len(inc) > 0
+    assert not inc["converted"].any()
+    assert f.loc[~f["incomplete"], "converted"].equals(f.loc[~f["incomplete"], "n_approved"] > 0)
+
+
+def test_immature_data_is_refused(tmp_path, protocol):
+    import json
+
+    write_scenario("null", out_root=tmp_path, candidate_users=3000)
+    mf = tmp_path / "null" / "manifest.json"
+    m = json.loads(mf.read_text())
+    assert "observation_end" in m
+    m["observation_end"] = "2026-03-20T00:00:00"  # before the analysis day
+    mf.write_text(json.dumps(m))
+    with pytest.raises(an.DataNotMatureError):
+        an.analyze(tmp_path / "null", protocol)
+    del m["observation_end"]
+    mf.write_text(json.dumps(m))
+    with pytest.raises(an.DataNotMatureError):
+        an.analyze(tmp_path / "null", protocol)
+
+
+def _res(gates_ok=True, ci=(0.01, 0.03), statuses=("pass",) * 5):
+    return {
+        "gates": {k: {"pass": gates_ok} for k in
+                  ("srm", "assignment_integrity", "events_before_exposure", "missing_events")},
+        "primary": {"ci_low": ci[0], "ci_high": ci[1]},
+        "guardrails": [{"id": f"G{i + 1}", "status": s} for i, s in enumerate(statuses)],
+    }
+
+
+def test_decide_rule_order_and_edges():
+    def d(**kw):
+        return decide(_res(**kw))["decision"]
+
+    ok5, fail5 = ("pass",) * 5, ("fail",) * 5
+    assert d() == "LAUNCH"
+    assert d(gates_ok=False, ci=(-0.05, -0.02), statuses=fail5) == "INVALID"  # INVALID wins
+    # harm: primary CI entirely below 0, or any guardrail fail -> DO NOT LAUNCH (before LAUNCH)
+    assert d(ci=(-0.05, -0.01)) == "DO NOT LAUNCH"
+    assert d(statuses=("pass", "fail", "pass", "pass", "pass")) == "DO NOT LAUNCH"
+    assert d(ci=(0.01, 0.03), statuses=("fail",) + ok5[:4]) == "DO NOT LAUNCH"
+    # not significant, or a guardrail undetermined -> INCONCLUSIVE
+    assert d(ci=(-0.01, 0.02)) == "INCONCLUSIVE"
+    assert d(statuses=("pass", "undetermined", "pass", "pass", "pass")) == "INCONCLUSIVE"
+    # boundaries: lower bound exactly 0 is not > 0; upper bound exactly 0 is not < 0
+    assert d(ci=(0.0, 0.02)) == "INCONCLUSIVE"
+    assert d(ci=(-0.02, 0.0)) == "INCONCLUSIVE"

@@ -111,6 +111,25 @@ def bootstrap_p95_diff(
             "ci_high": float(np.quantile(diffs, 0.975))}  # fmt: skip
 
 
+class DataNotMatureError(ValueError):
+    """Data observed before the protocol's analysis day: effects/chargebacks would be censored."""
+
+
+def check_maturity(frames: dict[str, Any], manifest: dict[str, Any], protocol: dict[str, Any]) -> str:
+    """Require observation_end >= last exposure + conversion window + chargeback maturation."""
+    end = manifest.get("observation_end")
+    if end is None:
+        raise DataNotMatureError("manifest has no observation_end; cannot verify the analysis day")
+    w = protocol["windows_days"]
+    need = frames["users"]["t_exp"].max() + pd.Timedelta(
+        days=w["conversion"] + w["chargeback_maturation"])
+    if pd.Timestamp(end) < need:
+        raise DataNotMatureError(
+            f"observation_end {end} is before the analysis day (needs >= {need}): "
+            "conversions/chargebacks are not mature")  # fmt: skip
+    return str(end)
+
+
 # ------------------------------------------------------------------ data loading
 def load_dataset(data_dir: Path) -> tuple[pd.DataFrame, pd.DataFrame, dict[str, Any]]:
     data_dir = Path(data_dir)
@@ -159,6 +178,8 @@ def build_frames(
     mx = att.groupby("user_id")["attempt_no"].max()
     gap = (mx != att.groupby("user_id").size().reindex(mx.index)).reindex(u.user_id).fillna(False)
     u["incomplete"] = (u["user_id"].isin(orphan.index) | gap.to_numpy().astype(bool))
+    # protocol 7.3: incomplete trails stay in the denominator (ITT) and do NOT count as conversions
+    u["converted"] = u["converted"] & ~u["incomplete"]
     att = att.merge(u[["user_id", "assigned_arm"]], on="user_id")
     return {"users": u, "attempts": att, "events_before_exposure": before}
 
@@ -299,6 +320,7 @@ def analyze(data_dir: Path, protocol: dict[str, Any] | None = None) -> dict[str,
     protocol = protocol or load_protocol()
     users, events, manifest = load_dataset(data_dir)
     frames = build_frames(users, events, protocol)
+    observation_end = check_maturity(frames, manifest, protocol)
     u = frames["users"]
     gates = validity_gates(users, frames, protocol)
     return {
@@ -310,7 +332,7 @@ def analyze(data_dir: Path, protocol: dict[str, Any] | None = None) -> dict[str,
                  "amendments": len(lock["amendments"]),
                  "window_days": {"conversion": protocol["windows_days"]["conversion"],
                                  "chargeback": protocol["windows_days"]["chargeback_maturation"]},
-                 "events": int(len(events))},  # fmt: skip
+                 "observation_end": observation_end, "events": int(len(events))},  # fmt: skip
         "counts": {"candidates": int(len(users)), "eligible": int(users.eligible.sum()),
                    "exposed_a": int((u.assigned_arm == "A").sum()),
                    "exposed_b": int((u.assigned_arm == "B").sum()),
