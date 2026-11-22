@@ -81,6 +81,36 @@ def run_closing(
                      "actual_vs_forecast_pct": (a - f) / f})
     headline = pd.DataFrame(head)
 
+    mm = D["monthly"][["month", "country", "tpv_brl", "net_revenue_brl", "contribution_brl"]].copy()
+    for c in ("tpv_brl", "net_revenue_brl", "contribution_brl"):
+        mm[c] = mm[c].astype(float)
+    mm = mm.rename(columns={c: f"actual_{c[:-4]}" for c in ("tpv_brl", "net_revenue_brl",
+                                                             "contribution_brl")})
+    b1 = D["budget"][["month", "country", "tpv_brl", "net_revenue_brl", "contribution_brl"]]
+    b1 = b1.rename(columns={c: f"budget_v1_{c[:-4]}" for c in ("tpv_brl", "net_revenue_brl",
+                                                                "contribution_brl")})
+    monthly_summary = mm.merge(b1, on=["month", "country"], how="left")
+    b2_path = data / "budget_v2.parquet"
+    if b2_path.exists():
+        b2 = pd.read_parquet(b2_path)[["month", "country", "tpv_brl", "net_revenue_brl",
+                                       "contribution_brl"]]
+        b2 = b2.rename(columns={c: f"budget_v2_{c[:-4]}" for c in ("tpv_brl", "net_revenue_brl",
+                                                                    "contribution_brl")})
+        monthly_summary = monthly_summary.merge(b2, on=["month", "country"], how="left")
+    monthly_summary = monthly_summary.sort_values(["month", "country"]).reset_index(drop=True)
+    budget2 = (pnl.pl_from_table(pd.read_parquet(b2_path), t4s, t4e) if b2_path.exists() else None)
+    if budget2 is not None:
+        rows2 = []
+        for col in ("tpv", "net", "contribution"):
+            a2, b1, b2 = (float(x[col].sum()) for x in (actual, budget, budget2))
+            rows2.append({"metric": NAMES[col], "actual": a2, "budget_v1": b1, "budget_v2": b2,
+                          "v1_err_pct": (b1 - a2) / a2, "v2_err_pct": (b2 - a2) / a2,
+                          "forecast_composed": float(forecast[col].sum()),
+                          "forecast_err_pct": (float(forecast[col].sum()) - a2) / a2})
+        budget_cmp = pd.DataFrame(rows2)
+    else:
+        budget_cmp = None
+
     # ---- bridges ------------------------------------------------------------------------------
     bridges = {"budget_to_forecast": contribution_bridge(budget, forecast),
                "forecast_to_actual": contribution_bridge(forecast, actual),
@@ -193,11 +223,14 @@ def run_closing(
                                     f"{bud_ratio.loc[c, 'take']:.4f}"})
     al_ante, al_post = AL.evaluate(ex_ante, rules), AL.evaluate(ex_post, rules)
 
-    out = {"ratio_check": ratio_check, "headline": headline, "fee_parts": fee_parts, "lmdi": lm, "scenarios": stab,
+    if budget2 is not None:
+        bridges["budget_v2_to_actual"] = contribution_bridge(budget2, actual)
+    out = {"monthly_summary": monthly_summary, "budget_cmp": budget_cmp, "budget2": budget2, "ratio_check": ratio_check, "headline": headline, "fee_parts": fee_parts, "lmdi": lm, "scenarios": stab,
            "scenario_position": scen_pos, "sensitivity": sens, "band": band_df,
            "alerts_ex_ante": al_ante, "alerts_ex_post": al_post, **bridges,
            "actual": actual, "budget": budget, "forecast": forecast,
-           "q3_drivers": q3, "q4_drivers": q4}
+           "q3_drivers": q3, "q4_drivers": q4, "base_tpv": tpv_fc, "base_ratios": base_ratios,
+           "champions": champs, "as_of": as_of, "t4": (t4s, t4e)}
     _write(out, rep, scen_cfg, bt_cfg)
     return out
 
@@ -216,6 +249,22 @@ def _generator_seasonal_ref() -> str:
         return "Fator sazonal do gerador indisponível [TO VERIFY]."
 
 
+def _v2_section(o: dict[str, Any]) -> str:
+    if o["budget_cmp"] is None:
+        return ""
+    c = o["budget_cmp"]
+    t, m = c.iloc[0], c.iloc[2]
+    return f"""**Orçamento v2 (reforecast congelado em 30/09, só com dados ≤ 30/09).** Regras em `configs/budget_v2_rules.yaml`: nível = TPV de setembro por dia e país, crescimento composto de abril a setembro, razões dos últimos 90 dias. Erro do TPV no trimestre: v1 {t.v1_err_pct:+.1%}, v2 {t.v2_err_pct:+.1%}, previsão composta {t.forecast_err_pct:+.1%}. Erro da margem: v1 {m.v1_err_pct:+.1%}, v2 {m.v2_err_pct:+.1%}, previsão composta {m.forecast_err_pct:+.1%} (erro = (plano − realizado) / realizado).
+
+{md_table(c, pct=("v1_err_pct", "v2_err_pct", "forecast_err_pct"), money=("actual", "budget_v1", "budget_v2", "forecast_composed"))}
+
+Ponte Orçamento v2 → Realizado:
+
+{md_table(o["budget_v2_to_actual"], money=("effect",))}
+
+"""
+
+
 def _top(bridge: pd.DataFrame, n: int = 3) -> str:
     b = bridge[bridge["kind"].isin(["fee", "cost"])].copy()
     b["abs"] = b["effect"].abs()
@@ -228,6 +277,10 @@ def _write(o: dict[str, Any], rep: Path, scen_cfg: dict, bt_cfg: dict) -> None:
               "forecast_to_actual", "budget_to_actual"):
         df = o[k]
         df.to_csv(rep / f"p24_{k}.csv", index=k == "fee_parts")
+    o["monthly_summary"].to_csv(rep / "monthly_actual_vs_budget.csv", index=False)
+    if o["budget_cmp"] is not None:
+        o["budget_cmp"].to_csv(rep / "p24_budget_v1_v2_actual.csv", index=False)
+        o["budget_v2_to_actual"].to_csv(rep / "p24_budget_v2_to_actual.csv", index=False)
     h = o["headline"].set_index("metric")
     tpv, con = h.loc["TPV"], h.loc["Contribution margin"]
     n_red = (o["alerts_ex_ante"]["severity"] == "red").sum()
@@ -278,6 +331,7 @@ Isto é uma diferença aritmética entre premissas e razões observadas. Os efei
 
 Receita de fee, Orçamento → Realizado (puros + interação): {", ".join(f"{k} {v:+,.0f}" for k, v in o["fee_parts"].loc["budget_to_actual"].items())}.
 
+{_v2_section(o)}
 ## 4. O que mudou no volume: Jul–Set → Out–Dez (LMDI, descritivo)
 TPV = merchants com venda × pagamentos/merchant × ticket médio. Os efeitos somam exatamente a variação de TPV entre os dois trimestres (interações repartidas simetricamente).
 

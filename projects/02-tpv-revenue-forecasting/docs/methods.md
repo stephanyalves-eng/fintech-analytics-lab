@@ -39,3 +39,6 @@ Margem de contribuição é ruidosa (chargebacks e custos sintéticos), e nenhum
 3. **Erro de curto prazo continua razoável:** WAPE do campeão em TPV total nos primeiros 7 e 30 dias de T4 foi 7,4% e 6,4%; o erro explode nos meses seguintes.
 4. A margem do orçamento (+231%) mostra um orçamento muito acima do realizado; a decomposição (volume, take rate, custo, refund/chargeback) é o P2.4.
 5. Limites: um ano de histórico; ETS/SARIMA com 273 dias de treino; teste de significância pareado aproximado; só um holdout (um trimestre), então a comparação com o orçamento é um caso, não uma estatística.
+
+## Orçamento v2 (reforecast no cut-off)
+Regras em `configs/budget_v2_rules.yaml`; números calculados só com dados ≤ 2025-09-30 e congelados em `configs/budget_v2.yaml` (hash, não sobrescreve): nível = TPV de setembro por dia e país; crescimento composto abril→setembro por país; take rate, refund+chargeback/fee e processamento/TPV dos últimos 90 dias. Erro do TPV de T4: v1 −34,6%, v2 −17,1%; da margem: v1 +231,4%, v2 −10,1% ((plano − realizado)/realizado). O v2 é uma projeção de ritmo e, como os demais modelos, não vê a sazonalidade de novembro/dezembro.

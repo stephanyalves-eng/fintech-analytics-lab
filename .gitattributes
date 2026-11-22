@@ -2,3 +2,5 @@
 projects/03-experimentation-lab/assets/vendor/axe.min.js -text
 *.png binary
 *.parquet binary
+
+projects/02-tpv-revenue-forecasting/assets/vendor/axe.min.js -text

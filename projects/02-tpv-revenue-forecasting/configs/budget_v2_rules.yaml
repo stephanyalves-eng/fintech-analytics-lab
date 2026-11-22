@@ -1,0 +1,9 @@
+# Budget v2 = run-rate reforecast made at the as-of date. Rules are fixed here; the numbers are
+# computed ONLY from data dated <= as_of and then frozen in configs/budget_v2.yaml (with a hash).
+version: v2
+as_of: "2025-09-30"
+months: ["2025-10-01", "2025-11-01", "2025-12-01"]          # closing quarter
+anchor_month: "2025-09-01"       # level = TPV of this month per day, by country
+growth_months: ["2025-04-01", "2025-09-01"]   # compound monthly growth between these two 30-day months
+ratios_window_days: 90           # take rate, refund+chargeback/fee, processing cost/TPV: trailing window at as_of
+# incentive_rate and var_cost_rate come from assumptions.yaml (they are contractual assumptions, not observed)

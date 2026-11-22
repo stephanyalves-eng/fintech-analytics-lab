@@ -1,0 +1,24 @@
+base_daily_tpv_brl:
+  BR: 141808.97
+  CL: 35178.68
+  MX: 45095.95
+created_at: '2026-11-22T01:19:27+00:00'
+data_cutoff: '2025-09-30'
+monthly_growth:
+  BR: 0.073847
+  CL: 0.026005
+  MX: 0.080096
+proc_share:
+  BR: 0.011625
+  CL: 0.019396
+  MX: 0.022207
+rc_share:
+  BR: 0.065939
+  CL: 0.071575
+  MX: 0.074083
+rules_version: v2
+table_hash: 04e11707475993eb1fb6d0a9f69c0f254aa87da0e27a5ab58ff4ced433ef28e4
+take_rate:
+  BR: 0.019316
+  CL: 0.024451
+  MX: 0.02542

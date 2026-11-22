@@ -54,3 +54,7 @@
 | 2026-11-21 | P2.4: ponte fee = volume + mix (país) + taxa + interação explícita; custos em volume e taxa/mix; falha se houver resíduo | Fecha exatamente com a variação total |
 | 2026-11-21 | P2.4: alertas com limites genéricos em `alerts.yaml`, avaliados ex-ante (≤ as-of) e ex-post | Limites transparentes e editáveis, não calibrados ao T4 |
 | 2026-11-21 | P2.4: achado: premissas de processamento (0,35%) e refund+chargeback (2% da fee) do orçamento v1 estão muito abaixo do observado; v1 segue congelado | Erro não proposital do P2.1; correção só em v2 |
+| 2026-11-21 | P2.5: orçamento v2 = reforecast de ritmo no as-of (nível de setembro, crescimento abr→set, razões de 90 d), calibrado só com dados ≤ 30/09 e congelado com hash | Corrige as premissas descalibradas do v1 sem olhar o T4; v1 permanece como está |
+| 2026-11-21 | P2.5: `cli pipeline` único; artefatos congelados são verificados e reutilizados; holdout recusa dados diferentes dos usados no congelamento (data_hash) | Reprodutibilidade em uma instrução, sem reescrever o que foi fixado |
+| 2026-11-21 | P2.5: auditoria independente recalcula do Parquet bruto com pandas (17 checks); tolerância de meio centavo por pagamento | O mart arredonda por pagamento (contrato do P1) |
+| 2026-11-21 | P2.5: dashboard em inglês como P1/P3, tokens neutros; scripts de screenshot/axe reutilizam o helper CDP do P3 | Consistência e sem nova dependência |

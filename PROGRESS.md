@@ -6,13 +6,13 @@
 | M1 P1 dados e SQL | concluído (P1.1–P1.3) | pytest 42 passed; `cli check` 18/18 PASS em 500k tentativas |
 | M2 P1 dashboard | concluído (P1.4–P1.5) | pytest 59 passed; ruff ok; 7 screenshots reais; 2M tentativas: consultas ≤ 62 ms |
 | M3 P2 dados e modelos | concluído (P2.1–P2.3) | pytest 138 passed; ver log P2.3 |
-| M4 P2 dashboard | pendente | |
+| M4 P2 dashboard | concluído (P2.5) | pytest 164 passed; audit 17/17; 11 screenshots reais; axe 0 violações |
 | M5 P3 protocolo e simulação | concluído (P3.1–P3.2) | ver log P3.2 |
 | M6 P3 análise e dashboard | concluído (P3.3–P3.5) | ver log P3.3–P3.5 |
 | M7 auditoria/publicação | pendente | |
 
 ## Próximo passo
-P2.5 (dashboard, auditoria e publicação) ou auditoria independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
+auditoria independente final (M7) e publicação do repositório (CI nunca rodou; sem remote) independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
 
 ## Log
 - 2026-11-21 M0: estrutura do monorepo, pyproject, ruff, pytest e CI criados.
@@ -36,3 +36,5 @@ P2.5 (dashboard, auditoria e publicação) ou auditoria independente do P3 (M7).
 - 2026-11-21 P2.2: mart diário DuckDB sobre o P1 (`cli build`): merchant (88.199 linhas), segmento, total (365 d), mensal; refund/chargeback sintéticos (5.112/522, seed fixa); calendário; orçamento v1 congelado (jan/2025, +4% a.m.) com hash; splits e features sem vazamento. Checks R01–R10 passam; build repetido ⇒ mesmos hashes. ruff ok; pytest 128 passed. Feriados por regra curada `[TO VERIFY]`; premissas ainda não calibradas.
 - 2026-11-21 P2.3: 6 modelos (naive, snaive, ma7/28, ETS, SARIMA) × 6 alvos, 26 origens semanais, 0 fits falhos (27 s). Validação: SARIMA campeão em 5 alvos (TPV total WAPE 6,2% vs snaive 9,1%); margem fica com ma7 (42%). Holdout T4 (uma vez): todos os modelos subestimam; TPV total campeão −20,8% vs orçamento −34,6%; cobertura 80% = 19,6%. Ver `docs/methods.md`. ruff ok; pytest 138 passed.
 - 2026-11-21 P2.4: `cli close`: pontes Orçamento→Previsão→Realizado (fecham sem resíduo), LMDI Q3→T4, 3 cenários + sensibilidade + banda estatística (separados), 20 alertas ex-ante (8 vermelhos, 2 amarelos) e relatório executivo gerado só com valores calculados. TPV realizado +53,0% vs orçamento; margem −69,8%. Achado: premissas de processamento (0,35% vs ≈1,5% do TPV) e refund+chargeback (2% vs ≈7% da fee) do orçamento v1 estavam descalibradas (erro do P2.1, não declarado); v1 segue congelado. ruff ok; pytest 152 passed.
+- 2026-11-21 Orçamento v2: reforecast de ritmo congelado no as-of (só dados ≤ 30/09): erro do TPV de T4 −17,1% (v1 −34,6%), da margem −10,1% (v1 +231,4%). Integrado ao relatório de fechamento.
+- 2026-11-21 P2.5: `cli pipeline`/`dashboard`/`audit`; cockpit Streamlit com 8 abas (fechamento, histórico, previsão e intervalos, modelos, cenários, ponte, alertas, sobre/exportação), filtros de período/país/método/tier/merchant/grão/modelo, CSV e one-pager HTML. Auditoria independente do bruto: 17/17 PASS. 11 screenshots reais (9 desktop, 2 mobile); axe 0 violações em 2 execuções consecutivas (a 1ª reportou contraste não reproduzido [TO VERIFY]). Teclado e leitor de tela [TO VERIFY]. Carga 1,4 s; filtro 0,3 s.

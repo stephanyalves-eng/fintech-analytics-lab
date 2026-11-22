@@ -76,3 +76,12 @@ def pl_from_ratios(tpv: pd.Series, r: pd.DataFrame) -> pd.DataFrame:
 
 def trailing_window(as_of: date, days: int) -> tuple[date, date]:
     return as_of - timedelta(days=days - 1), as_of
+
+
+def pl_from_table(t: pd.DataFrame, start: date, end: date) -> pd.DataFrame:
+    """Budget v2 table (explicit line columns) -> P&L frame by country."""
+    m = pd.to_datetime(t["month"])
+    g = t[(m >= pd.Timestamp(start)) & (m <= pd.Timestamp(end))].groupby("country")[
+        ["tpv_brl", "fee_brl", "rc_brl", "inc_brl", "proc_brl", "var_brl"]].sum().reindex(COUNTRIES)
+    g.columns = LINES
+    return with_derived(g)

@@ -1,0 +1,50 @@
+[
+  {
+    "view": "closing",
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1
+  },
+  {
+    "view": "history",
+    "violations": [],
+    "passes": 27,
+    "incomplete": 1
+  },
+  {
+    "view": "forecast_intervals",
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1
+  },
+  {
+    "view": "models",
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1
+  },
+  {
+    "view": "scenarios",
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1
+  },
+  {
+    "view": "variance_bridge",
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1
+  },
+  {
+    "view": "risk_alerts",
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1
+  },
+  {
+    "view": "about_export",
+    "violations": [],
+    "passes": 29,
+    "incomplete": 1
+  }
+]

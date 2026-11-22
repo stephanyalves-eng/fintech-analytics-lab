@@ -99,6 +99,35 @@ Isto é uma diferença aritmética entre premissas e razões observadas. Os efei
 
 Receita de fee, Orçamento → Realizado (puros + interação): volume +207,920, mix -4,658, rate -282, interaction -3,691.
 
+**Orçamento v2 (reforecast congelado em 30/09, só com dados ≤ 30/09).** Regras em `configs/budget_v2_rules.yaml`: nível = TPV de setembro por dia e país, crescimento composto de abril a setembro, razões dos últimos 90 dias. Erro do TPV no trimestre: v1 -34.6%, v2 -17.1%, previsão composta -20.4%. Erro da margem: v1 +231.4%, v2 -10.1%, previsão composta -13.9% (erro = (plano − realizado) / realizado).
+
+| metric | actual | budget_v1 | budget_v2 | v1_err_pct | v2_err_pct | forecast_composed | forecast_err_pct |
+|---|---|---|---|---|---|---|---|
+| TPV | 28,142,909 | 18,399,499 | 23,327,645 | -34.6% | -17.1% | 22,394,835 | -20.4% |
+| Net revenue | 532,028 | 375,585 | 451,743 | -29.4% | -15.1% | 434,192 | -18.4% |
+| Contribution margin | 88,336 | 292,787 | 79,430 | 231.4% | -10.1% | 76,070 | -13.9% |
+
+Ponte Orçamento v2 → Realizado:
+
+| step | effect | kind |
+|---|---|---|
+| Contribution (reference) | 79,430 | start |
+| Fee: TPV volume | 102,734 | fee |
+| Fee: country mix | -720 | fee |
+| Fee: take rate | -6,257 | fee |
+| Fee: interaction (vol x mix x rate) | -1,527 | fee |
+| Refund + chargeback: volume | -7,078 | cost |
+| Refund + chargeback: rate/mix | -4,458 | cost |
+| Incentives: volume | -2,408 | cost |
+| Incentives: rate/mix | -0 | cost |
+| Processing cost: volume | -72,037 | cost |
+| Processing cost: rate/mix | 5,473 | cost |
+| Other variable cost: volume | -4,815 | cost |
+| Other variable cost: rate/mix | -0 | cost |
+| Residual | 0 | residual |
+| Contribution (compared) | 88,336 | end |
+
+
 ## 4. O que mudou no volume: Jul–Set → Out–Dez (LMDI, descritivo)
 TPV = merchants com venda × pagamentos/merchant × ticket médio. Os efeitos somam exatamente a variação de TPV entre os dois trimestres (interações repartidas simetricamente).
 

@@ -21,12 +21,14 @@ BUDGET_COL = {"tpv_total": "tpv_brl", "net_revenue_total": "net_revenue_brl",
 
 def run_holdout(
     full_series: dict[str, pd.Series], cfg: dict[str, Any], champions_path: str | Path,
-    budget: pd.DataFrame,
+    budget: pd.DataFrame, expected_data_hash: str | None = None,
 ) -> tuple[pd.DataFrame, pd.DataFrame]:
     """-> (daily forecast rows for every model, per-target T4 summary incl. budget variance)."""
     doc = yaml.safe_load(Path(champions_path).read_text(encoding="utf-8"))
     if doc["config_hash"] != cfg_hash(cfg):
         raise ValueError("backtest config changed after the champions were frozen")
+    if expected_data_hash is not None and doc.get("data_hash") != expected_data_hash:
+        raise ValueError("data changed after the champions were frozen (data_hash mismatch)")
     as_of = pd.Timestamp(d(cfg["as_of"]))
     h = int(cfg["max_horizon"])
     rows, summ = [], []

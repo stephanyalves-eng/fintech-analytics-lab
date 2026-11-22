@@ -1,0 +1,16 @@
+step,effect,kind
+Contribution (reference),79430.27369999998,start
+Fee: TPV volume,102734.23900603008,fee
+Fee: country mix,-720.4633700997002,fee
+Fee: take rate,-6256.678750636676,fee
+Fee: interaction (vol x mix x rate),-1527.1946852937779,fee
+Refund + chargeback: volume,-7078.371210811961,cost
+Refund + chargeback: rate/mix,-4458.41868918805,cost
+Incentives: volume,-2407.6316411400385,cost
+Incentives: rate/mix,-0.09145885996076686,cost
+Processing cost: volume,-72037.07549728027,cost
+Processing cost: rate/mix,5472.556297280287,cost
+Other variable cost: volume,-4815.263261638202,cost
+Other variable cost: rate/mix,-0.19683836180229264,cost
+Residual,6.548361852765083e-11,residual
+Contribution (compared),88335.68359999997,end
