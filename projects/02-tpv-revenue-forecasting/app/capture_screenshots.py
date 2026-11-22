@@ -13,23 +13,9 @@ from __future__ import annotations
 
 import argparse
 import asyncio
-import importlib.util
-import json
-import shutil
-import subprocess
-import sys
-import tempfile
-import time
-import urllib.request
 from pathlib import Path
 
-import websockets
-
-_P3 = Path(__file__).resolve().parents[2] / "03-experimentation-lab" / "app" / "capture_screenshots.py"
-_spec = importlib.util.spec_from_file_location("p3_capture", _P3)  # unique name: no clash with us
-_p3 = importlib.util.module_from_spec(_spec)
-_spec.loader.exec_module(_p3)
-BROWSERS, CDP = _p3.BROWSERS, _p3.CDP
+from fintech_lab.shared.browser_cdp import CDP, close, open_page  # noqa: E402,F401
 
 OUT = Path(__file__).resolve().parents[1] / "assets" / "screenshots"
 TABS = ["closing", "history", "forecast_intervals", "models", "scenarios", "variance_bridge",
@@ -43,25 +29,8 @@ async def _no_exception(cdp: CDP, where: str) -> None:
 
 
 async def capture(url: str) -> None:
-    exe = next((b for b in BROWSERS if Path(b).exists() or shutil.which(b)), None)
-    if exe is None:
-        raise SystemExit("No Edge/Chrome found")
-    profile = tempfile.mkdtemp(prefix="p2shots_")
-    proc = subprocess.Popen(
-        [exe, "--headless=new", f"--remote-debugging-port={PORT}", f"--user-data-dir={profile}",
-         "--hide-scrollbars", "--force-color-profile=srgb", "about:blank"],
-        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    proc, profile, cdp = await open_page(PORT, "p2shots")
     try:
-        for _ in range(50):
-            try:
-                pages = json.load(urllib.request.urlopen(f"http://127.0.0.1:{PORT}/json/list"))
-                ws_url = next(p["webSocketDebuggerUrl"] for p in pages if p["type"] == "page")
-                break
-            except Exception:
-                time.sleep(0.2)
-        else:
-            raise SystemExit("browser did not start")
-        cdp = CDP(await websockets.connect(ws_url, max_size=None))
         OUT.mkdir(parents=True, exist_ok=True)
         for label, w, h, mobile in (("desktop", 1440, 2400, False), ("mobile", 390, 3400, True)):
             await cdp("Emulation.setDeviceMetricsOverride", width=w, height=h,
@@ -86,12 +55,7 @@ async def capture(url: str) -> None:
                 await _no_exception(cdp, "history/month")
                 await cdp.shot(OUT / "09_history_month_desktop.png")
     finally:
-        if sys.platform == "win32":
-            subprocess.call(["taskkill", "/T", "/F", "/PID", str(proc.pid)],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        else:
-            proc.terminate()
-        shutil.rmtree(profile, ignore_errors=True)
+        close(proc, profile)
 
 
 if __name__ == "__main__":

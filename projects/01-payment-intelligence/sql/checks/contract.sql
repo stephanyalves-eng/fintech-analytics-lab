@@ -150,3 +150,14 @@ FROM p LEFT JOIN stg_fx_rate fx ON fx.currency = p.currency AND fx.rate_date = p
 WHERE fx.rate_to_brl IS NULL OR fx.rate_to_brl <= 0
 UNION ALL
 SELECT 'activation_after_payment', payment_id FROM p WHERE d < activation_date;
+
+-- name: c14_settlement_date_lag
+-- Settlement date = merchant-local date of the approving attempt + the method's settlement lag (D+N).
+SELECT s.settlement_id
+FROM stg_settlement s
+JOIN stg_payment p USING (payment_id)
+JOIN stg_merchant m USING (merchant_id)
+JOIN stg_payment_method pm ON pm.method_code = p.method_code
+JOIN stg_attempt a ON a.payment_id = s.payment_id AND a.result = 'approved'
+WHERE s.settlement_date
+      <> CAST(timezone(m.timezone, timezone('UTC', a.attempted_at_utc)) AS DATE) + pm.settlement_lag_days;

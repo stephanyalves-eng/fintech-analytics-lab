@@ -1,3 +1,5 @@
+# Normalize text to LF on checkout so regenerated reports do not show line-ending noise
+* text=auto eol=lf
 # Keep vendored/binary files byte-exact (the axe hash is pinned in a11y_audit.py)
 shared/vendor/axe.min.js -text
 *.png binary

@@ -111,7 +111,8 @@ def _backtest(a: argparse.Namespace) -> int:
     logs.assign(info=logs["info"].astype(str)).to_parquet(bdir / "fit_log.parquet", index=False)
     rep = Path(a.reports)
     rep.mkdir(parents=True, exist_ok=True)
-    summ.to_csv(rep / "backtest_metrics.csv", index=False)
+    # machine-dependent timings stay in the parquet only, so reruns do not dirty the versioned CSV
+    summ.drop(columns=["sec_per_fit"]).to_csv(rep / "backtest_metrics.csv", index=False)
     champs.to_csv(rep / "champions.csv", index=False)
     comp = (summ.pivot_table(index=["target", "model"], columns="horizon", values="wape")
             .assign(composite=lambda x: x.mean(axis=1, skipna=False)).reset_index())

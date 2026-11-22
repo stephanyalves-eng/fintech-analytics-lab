@@ -2,7 +2,7 @@
 
 > **Dados sintéticos.** Todos os números abaixo são `derived` de um dataset `synthetic` gerado com seed fixa. Os padrões encontrados foram **plantados pelo gerador** (circularidade). Os cenários são *estimativas simuladas sob pressupostos explícitos*, não uplift realizado nem prova causal. Receita/take rate dependem de MDR sintético: **[TO VERIFY]**.
 
-- Gerado em: 2026-11-21 por `python -m fintech_lab.p1_payments.cli diagnose`
+- Gerado por `python -m fintech_lab.p1_payments.cli diagnose` a partir do dataset `fa2f4dc4ed38` (sem data de execução: a mesma entrada gera o mesmo memo)
 - Dataset: seed `20261121`, 447.090 pagamentos, 500.000 tentativas; SHA-256 do conteúdo `fa2f4dc4ed3873b0…`
 - Tabelas completas (CSV) em `reports/diagnostics/`.
 

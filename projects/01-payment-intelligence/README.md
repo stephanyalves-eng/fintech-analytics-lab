@@ -11,8 +11,8 @@
 |---|---|---|
 | Design | Personas, business questions, data contracts, metric catalog M01–M14 (grain, numerator, denominator) | [`docs/`](docs/) |
 | Generator | Deterministic PSP simulator: 3 countries/currencies, cards + Pix, up to 3 attempts per payment, latent risk, Parquet + manifest with SHA-256 | `src/fintech_lab/p1_payments/generator.py`, [`configs/generator.yaml`](configs/generator.yaml) |
-| Data-quality fixture | Separate corrupted dataset with 14 injected defects, each caught by a check | `corrupt.py`, `tests/p1/test_quality_checks.py` |
-| SQL | DuckDB staging → core → 5 marts, 13 contract + 5 reconciliation checks, 15 analyses, EXPLAIN ANALYZE plans | [`sql/`](sql/), [`docs/sql_walkthrough.md`](docs/sql_walkthrough.md) |
+| Data-quality fixture | Separate corrupted dataset with 15 injected defects, each caught by a check | `corrupt.py`, `tests/p1/test_quality_checks.py` |
+| SQL | DuckDB staging → core → 5 marts, 14 contract + 5 reconciliation checks, 15 analyses, EXPLAIN ANALYZE plans | [`sql/`](sql/), [`docs/sql_walkthrough.md`](docs/sql_walkthrough.md) |
 | Diagnosis & scenarios | Failure taxonomy, mix-adjusted acquirer ranking, S1 rerouting and S2 retry-cap simulations with intervals and sensitivity grids | [`reports/diagnostic_memo.md`](reports/diagnostic_memo.md) |
 | Dashboard | Streamlit, 6 tabs, filters that keep denominators correct, provenance and synthetic labels | [`app/app.py`](app/app.py), [`docs/dashboard_qa.md`](docs/dashboard_qa.md) |
 | Audit | Independent review with severity-ranked findings and the fixes applied | [`reports/audit_report.md`](reports/audit_report.md) |
@@ -46,5 +46,5 @@ The same seed gives the same `dataset_content_sha256` in the same environment. T
 - Circularity: the generator planted every effect found here (for example acquirer gaps and peak-hour errors).
 - S1 is close to unbiased only because the generator randomizes acquirer switching. Real routing is risk-dependent, so the same comparison would be confounded, and a randomized test is needed (Project 03).
 - The generator models no merchant churn, so cohort retention is about 1 by construction (SQL demo only).
-- Keyboard and screen-reader accessibility have not been audited **[TO VERIFY]**. No dark theme.
+- Accessibility: an automated, partial keyboard smoke test exists (`reports/keyboard_smoke.md`: no keyboard trap, arrow keys move between tabs). A human keyboard pass and a screen-reader pass are still **[TO VERIFY]**. No dark theme.
 - CI is configured (`.github/workflows/ci.yml`) but has not run yet, because the repository has no remote **[TO VERIFY]**.

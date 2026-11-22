@@ -14,7 +14,7 @@ python -m fintech_lab.p2_forecasting.cli audit          # independent recompute 
 pytest -q tests/p2
 ```
 Frozen artifacts (`configs/budget_v1.yaml`, `budget_v2.yaml`, `champions_b1.yaml`) are verified and reused,
-never overwritten. The pipeline is idempotent: same inputs give the same tables (only `sec_per_fit` varies).
+never overwritten. The pipeline is idempotent: same inputs give the same tables and CSV reports (fit timings are kept only in the parquet).
 
 ## What is inside
 | Stage | Where |
@@ -23,7 +23,7 @@ never overwritten. The pipeline is idempotent: same inputs give the same tables 
 | Daily mart (DuckDB on P1 core) + reconciliation R01–R10 | `sql/mart.sql`, `sql/checks.sql`, `src/fintech_lab/p2_forecasting/mart.py` |
 | Baselines, ETS, SARIMA, rolling-origin backtest, frozen champions, T4 holdout | `docs/methods.md`, `reports/backtest_*`, `reports/holdout_t4.*` |
 | Scenarios, variance bridges, alerts, executive report | `docs/scenarios_bridge.md`, `reports/executive_closing_report.md`, `reports/p24_*.csv` |
-| Budget v1 (as-of 2024-12-31, purposeful error) and v2 (run-rate reforecast at the cut-off) | `configs/`, `docs/assumptions.md`, `docs/methods.md` |
+| Budget v1 (labelled as-of 2024-12-31, anchored on January 2025; purposeful error) and v2 (run-rate reforecast at the cut-off) | `configs/`, `docs/assumptions.md`, `docs/methods.md` |
 | Dashboard, one-pager, QA, audit | `app/app.py`, `reports/executive_one_pager.html`, `docs/dashboard_qa.md`, `reports/audit_p2.md`, `reports/a11y_axe.md` |
 
 ## Headline (T4/2025, computed; see the report for definitions)
@@ -34,5 +34,5 @@ assumptions were not calibrated to P1 (documented; v1 stays frozen). Budget v2 (
 
 ## Limits
 One year of history (no annual seasonality learnable), one holdout quarter, scenario values are assumptions,
-holidays are a curated rule set `[TO VERIFY]`, keyboard and screen-reader checks are `[TO VERIFY]`.
+holidays are a curated rule set `[TO VERIFY]`, an automated, partial keyboard smoke test exists (`reports/keyboard_smoke.md`) but human keyboard and screen-reader checks are `[TO VERIFY]`.
 Design tokens are neutral placeholders until the brand design system is provided.

@@ -6,7 +6,6 @@ All numbers in the memo are computed here from the warehouse; nothing is hand-wr
 from __future__ import annotations
 
 import json
-from datetime import date
 from pathlib import Path
 
 import duckdb
@@ -87,7 +86,7 @@ def md_table(df: pd.DataFrame, cols: dict[str, tuple[str, str]]) -> str:
     return "\n".join([head, sep, *rows])
 
 
-def render_memo(t: dict[str, pd.DataFrame], manifest: dict, generated_on: str) -> str:
+def render_memo(t: dict[str, pd.DataFrame], manifest: dict, dataset_id: str) -> str:
     tax = t["d01_failure_taxonomy"]
     fail = tax[tax["result"] != "approved"]
     cat = fail.groupby(["country", "category"], as_index=False)[["attempts", "share_of_attempts"]]
@@ -160,7 +159,10 @@ def render_memo(t: dict[str, pd.DataFrame], manifest: dict, generated_on: str) -
         "**[TO VERIFY]**."
     )
     a("")
-    a(f"- Gerado em: {generated_on} por `python -m fintech_lab.p1_payments.cli diagnose`")
+    a(
+        f"- Gerado por `python -m fintech_lab.p1_payments.cli diagnose` a partir do dataset "
+        f"{dataset_id} (sem data de execução: a mesma entrada gera o mesmo memo)"
+    )
     a(
         f"- Dataset: seed `{manifest.get('seed', '[TO VERIFY]')}`, "
         f"{_fmt(n_pay, 'int')} pagamentos, {_fmt(n_att, 'int')} tentativas; "
@@ -431,6 +433,7 @@ def write_reports(
         df.to_csv(tdir / f"{name}.csv", index=False, float_format="%.6g")
     mf = Path(data_dir) / "manifest.json"
     manifest = json.loads(mf.read_text(encoding="utf-8")) if mf.exists() else {}
-    memo = render_memo(tables, manifest, date.today().isoformat())
+    sha = str(manifest.get("dataset_content_sha256", "[TO VERIFY]"))
+    memo = render_memo(tables, manifest, f"`{sha[:12]}`")
     (out / "diagnostic_memo.md").write_text(memo, encoding="utf-8")
     return tables

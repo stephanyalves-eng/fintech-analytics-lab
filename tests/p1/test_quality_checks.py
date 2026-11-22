@@ -8,7 +8,7 @@ from fintech_lab.p1_payments.warehouse import run_checks
 
 def test_clean_dataset_passes_all_contract_checks(con):
     results = run_checks(con, "contract")
-    assert len(results) == 13
+    assert len(results) == 14
     assert results == dict.fromkeys(results, 0)
 
 

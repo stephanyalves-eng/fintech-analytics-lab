@@ -36,3 +36,6 @@ Saída: `assets/screenshots/0N_<aba>_{desktop,mobile}.png` (1440 px e 390 px).
 - O simulador roda sobre o dataset inteiro; os filtros da barra lateral não se aplicam nele (o aviso aparece na aba).
 - O `st.cache_data` não invalida quando o código de `dashboard_data.py` muda: reinicie o servidor após editar.
 - Tema escuro não foi configurado (o tema claro é fixado via `--theme.base light`).
+
+## Teclado (automatizado, parcial)
+55 candidatos interativos na primeira aba; 150 pressionamentos de Tab, 39 paradas de foco distintas, nenhuma armadilha de teclado, ArrowRight move o foco entre abas. Os botões da barra de ferramentas das tabelas (mostrar/ocultar colunas, baixar CSV, buscar, tela cheia) não receberam foco por Tab nesta execução (causa não investigada). Teste de teclado **automatizado e parcial** (`python -m fintech_lab.shared.keyboard_smoke`, relatório em `reports/keyboard_smoke.md`): sem armadilha de teclado, setas movem o foco entre abas, foco alcança os controles por Tab. Navegação humana por teclado e leitor de tela seguem `[TO VERIFY]`.

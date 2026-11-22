@@ -4,7 +4,7 @@ Camada analítica em DuckDB sobre o Parquet sintético. Os resultados são `deri
 
 ```powershell
 python -m fintech_lab.p1_payments.cli build      # data/p1/p1.duckdb
-python -m fintech_lab.p1_payments.cli check      # 13 checks de contrato + 5 de reconciliação
+python -m fintech_lab.p1_payments.cli check      # 14 checks de contrato + 5 de reconciliação
 python -m fintech_lab.p1_payments.cli explain    # EXPLAIN ANALYZE -> reports/query_plans/
 ```
 

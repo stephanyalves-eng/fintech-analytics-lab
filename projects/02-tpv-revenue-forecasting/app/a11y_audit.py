@@ -16,18 +16,11 @@ import argparse
 import asyncio
 import hashlib
 import json
-import shutil
-import subprocess
 import sys
-import tempfile
-import time
-import urllib.request
 from pathlib import Path
 
-import websockets
-
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from capture_screenshots import BROWSERS, CDP, TABS  # noqa: E402
+from capture_screenshots import TABS  # noqa: E402
 
 AXE_SHA256 = "b511cd9dec01c76f4b2ad1723b66b6db37d4c2eb4ed199076e1829d9ee7b75e3"
 RUN = (
@@ -39,6 +32,8 @@ RUN = (
     "passes: r.passes.length, incomplete: r.incomplete.length}))"
 )
 
+from fintech_lab.shared.browser_cdp import close, open_page  # noqa: E402
+
 ROOT = Path(__file__).resolve().parents[1]
 AXE = Path(__file__).resolve().parents[3] / "shared" / "vendor" / "axe.min.js"
 PORT = 9337
@@ -48,25 +43,9 @@ async def audit(url: str) -> list[dict]:
     src = AXE.read_bytes()
     if hashlib.sha256(src).hexdigest() != AXE_SHA256:
         raise SystemExit("axe.min.js does not match the pinned SHA-256; refusing to inject it")
-    exe = next((b for b in BROWSERS if Path(b).exists() or shutil.which(b)), None)
-    if exe is None:
-        raise SystemExit("No Edge/Chrome found")
-    profile = tempfile.mkdtemp(prefix="p2axe_")
-    proc = subprocess.Popen(
-        [exe, "--headless=new", f"--remote-debugging-port={PORT}", f"--user-data-dir={profile}",
-         "about:blank"], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+    proc, profile, cdp = await open_page(PORT, "p2axe")
     out: list[dict] = []
     try:
-        for _ in range(50):
-            try:
-                pages = json.load(urllib.request.urlopen(f"http://127.0.0.1:{PORT}/json/list"))
-                ws_url = next(p["webSocketDebuggerUrl"] for p in pages if p["type"] == "page")
-                break
-            except Exception:
-                time.sleep(0.2)
-        else:
-            raise SystemExit("browser did not start")
-        cdp = CDP(await websockets.connect(ws_url, max_size=None))
         await cdp("Emulation.setDeviceMetricsOverride", width=1440, height=2400,
                   deviceScaleFactor=1, mobile=False)
         await cdp("Page.navigate", url=url)
@@ -81,12 +60,7 @@ async def audit(url: str) -> list[dict]:
             out.append({"view": name, **r})
             print(f"{name:22} violations={len(r['violations'])} incomplete={r['incomplete']}")
     finally:
-        if sys.platform == "win32":
-            subprocess.call(["taskkill", "/T", "/F", "/PID", str(proc.pid)],
-                            stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-        else:
-            proc.terminate()
-        shutil.rmtree(profile, ignore_errors=True)
+        close(proc, profile)
     return out
 
 

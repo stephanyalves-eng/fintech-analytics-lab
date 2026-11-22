@@ -1,5 +1,9 @@
 """Time-safe features and chronological splits.
 
+STATUS: tested infrastructure for regressor-based models. The current models (baselines, ETS,
+SARIMA) use only the target series and do NOT consume these features; nothing reported by P2
+depends on them.
+
 Convention: for a target date ``t`` and horizon ``h`` the forecast origin is ``o = t - h``.
 Every history-based feature of row ``t`` uses only values dated ``<= o``. Calendar columns are
 known in advance and may use ``t`` itself.

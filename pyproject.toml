@@ -44,5 +44,6 @@ addopts = "-ra"
 # P2 report templates keep long prose/f-string lines for readability.
 "src/fintech_lab/p2_forecasting/closing.py" = ["E501"]
 "src/fintech_lab/p2_forecasting/audit.py" = ["E501"]
+"src/fintech_lab/shared/keyboard_smoke.py" = ["E501"]
 "projects/02-tpv-revenue-forecasting/app/*.py" = ["E501"]
 "projects/03-experimentation-lab/app/*.py" = ["E501"]

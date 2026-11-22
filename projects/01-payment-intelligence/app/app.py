@@ -45,7 +45,9 @@ HELP = {
     "m10": "M10 · grain: attempt. Error (timeout/acquirer error) attempts ÷ all attempts.",
     "m05": "M05 · grain: payment. Payments succeeded after attempt 1 ÷ payments whose 1st "
     "attempt failed soft or technical (hard declines excluded: not retryable).",
-    "m09": "M09 · processing cost (BRL, all attempts) ÷ succeeded payments.",
+    "m09": "M09 · processing cost (BRL, all attempts) ÷ succeeded payments. Under an acquirer "
+    "filter the cost still includes attempts made at the other acquirer (payments are assigned "
+    "by their first-attempt acquirer).",
 }
 
 st.set_page_config(page_title="P1 · Payment Intelligence", page_icon="💳", layout="wide")
@@ -344,6 +346,9 @@ with tabs[3]:
             "—" if k["m09"] is None else f"R$ {k['m09']:.3f}",
             help=HELP["m09"],
         )
+        if acqs:
+            st.caption("Acquirer filter active: M09 counts the cost of ALL attempts of the "
+                       "selected payments, including attempts at the other acquirer.")
         rr = q("retry_recovery", key, DB)
         if rr.empty:
             st.info("No payments with a retryable first failure in this selection.", icon="ℹ️")

@@ -30,6 +30,10 @@ Rótulos: `observed` (nenhum no P2), `synthetic`, `derived`.
 
 Premissas ficam em YAML versionado (`configs/assumptions.yaml`, `scenarios.yaml`, `alerts.yaml`, `backtest.yaml`), não em tabela. Feriados e eventos são colunas de `dim_calendar` (não há tabelas `ref_holiday`/`ref_events`).
 
+> `features.py` (defasagens, médias móveis, splits, testes anti-vazamento) é infraestrutura reservada para
+> modelos com regressores: os modelos atuais (baselines, ETS, SARIMA) usam só a série do alvo e **não** a
+> consomem; nenhum resultado do P2 depende dela.
+
 ## Regras de disponibilidade (anti-leakage)
 - Data `t` com origem `o` só usa dados com `date ≤ o`. Lags e médias móveis em dia `d` usam `d−k` com `k ≥ horizonte`, para previsão direta; para previsão recursiva, só o histórico até `o`.
 - Calendário (feriados, dia da semana) é conhecido com antecedência e pode ser usado no futuro. Eventos (Black Friday/Cyber Monday) entram em `dim_calendar` por regra, conhecidos antes da origem.

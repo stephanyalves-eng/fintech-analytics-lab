@@ -7,6 +7,7 @@ Starts from a small clean synthetic dataset and injects one controlled defect pe
 from __future__ import annotations
 
 import copy
+from datetime import timedelta
 from typing import Any
 
 import numpy as np
@@ -30,6 +31,7 @@ DEFECTS: dict[str, str] = {
     "clp_with_decimals": "c11_amount_valid",
     "settlement_for_failed": "c12_settlement_consistency",
     "settlement_currency_mismatch": "c12_settlement_consistency",
+    "settlement_date_wrong": "c14_settlement_date_lag",
 }
 
 
@@ -132,6 +134,13 @@ def make_corrupted(cfg: dict[str, Any]) -> tuple[dict[str, pd.DataFrame], dict[s
     pid = pick(sett.loc[sett["currency"] == "BRL", "payment_id"])
     sett.loc[sett["payment_id"] == pid, "currency"] = "MXN"
     log["settlement_currency_mismatch"] = [pid]
+
+    pid = pick(sett["payment_id"])
+    sel = sett["payment_id"] == pid
+    sett.loc[sel, "settlement_date"] = sett.loc[sel, "settlement_date"].map(
+        lambda x: x + timedelta(days=1)
+    )
+    log["settlement_date_wrong"] = [pid]
 
     t["fact_payment"], t["fact_attempt"], t["fact_settlement"] = pay, att, sett
     extra = {

@@ -193,4 +193,5 @@ Interação do cenário conservador (efeito conjunto − soma dos efeitos indivi
 - Refund, chargeback, incentivos, custo variável e orçamento são premissas sintéticas (`assumptions.yaml`), e o orçamento v1 tem erro proposital declarado: toda variação contra ele é sintética por construção.
 - Custo de processamento é tratado como proporção do TPV (as retentativas não são modeladas como driver separado).
 - A previsão composta usa razões dos últimos 90 dias; chargebacks têm atraso de 15–60 dias, então a razão no as-of é uma leitura em base de data de evento.
+- O orçamento v1 é rotulado as-of 2024-12-31, mas seu nível e take rate usam janeiro/2025 (o P1 não tem 2024): simplificação declarada, sem uso de T4.
 - Pontes explicam a diferença aritmética; não provam causa.

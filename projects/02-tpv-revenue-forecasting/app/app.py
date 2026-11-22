@@ -117,7 +117,9 @@ with st.sidebar:
     model = st.selectbox("Model (forecast & comparison tabs)", MODELS,
                          index=MODELS.index(champs[target]),
                          help="Default = frozen champion for the target")
-    st.caption("Filters change what is displayed. Models, budgets and thresholds are frozen.")
+    st.caption("Filters apply to History, Forecast and Models only. Closing, Scenarios, Variance "
+               "bridge, Risk alerts and About show the frozen closing quarter. Models, budgets "
+               "and thresholds are frozen.")
 
 infos = [("Data cut-off", str(as_of.date())), ("Last training day", str(as_of.date())),
          ("Forecast horizon", f"{hmax} days"), ("Backtest / budgets", f"{BT['version']} · v1 + v2"),
@@ -133,6 +135,7 @@ tabs = st.tabs(["Closing", "History", "Forecast & intervals", "Models", "Scenari
 with tabs[0]:
     h = CLS["headline"].set_index("metric")
     st.markdown(f"### Closing quarter {t4s.date()} → {t4e.date()} (BRL)")
+    st.caption("This tab shows the frozen closing quarter and does not react to the sidebar filters.")
     cols = st.columns(3)
     for col, name in zip(cols, ["TPV", "Net revenue", "Contribution margin"], strict=True):
         r = h.loc[name]
@@ -396,7 +399,8 @@ with tabs[7]:
         f"- **Cut-off / training day:** {as_of.date()}; horizon {hmax} days; splits "
         f"{man['splits']}.\n"
         f"- **Versions:** assumptions {man['assumptions_version']}, backtest {BT['version']}, "
-        f"budget v1 (as-of 2024-12-31, frozen, purposeful growth/mix error), budget v2 (as-of "
+        f"budget v1 (labelled as-of 2024-12-31 but level and take rate use January 2025 data, frozen, "
+        f"purposeful growth/mix error), budget v2 (as-of "
         f"{as_of.date()}, run-rate, frozen).\n"
         "- **Known limits:** one year of history (no annual seasonality learnable); one holdout "
         "quarter; budget v1 processing-cost and refund+chargeback assumptions were not calibrated "

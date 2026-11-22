@@ -160,3 +160,39 @@ def test_s1_bootstrap_degenerate_when_no_variation():
     pay = pd.DataFrame(rows)
     b = sc.s1_bootstrap(pay, pd.Series({"BR": 1000}), n_boot=20).iloc[0]
     assert b["d_succeeded_boot_lo95"] == b["d_succeeded_boot_hi95"] == pytest.approx(40.0)
+
+
+def test_s2_cap4_hand_computed_cost_and_contribution():
+    """Audit L3: numeric check of the cap-4 extrapolation, computed by hand.
+
+    retry propensity 60/100 = 0.6; attempt-3 approval 30/100 = 0.3, times delta 0.5 -> p4 = 0.15;
+    n4 = 50 * 0.6 = 30 fourth attempts; d_succeeded = 30 * 0.15 = 4.5; d_tpv = 4.5 * 200 = 900;
+    take = 2000 / 100000 = 0.02 -> d_fee = 18; cost = 30 * (0.15 * 0.01 * 200 + 0.85 * 0.5) = 21.75.
+    """
+    base = pd.DataFrame([{
+        "country": "BR", "payments": 1000, "succeeded": 800, "tpv_brl": 100000.0,
+        "fee_brl": 2000.0, "processing_cost_brl": 500.0, "succ_at_3": 10, "tpv_at_3_brl": 2000.0,
+        "fee_at_3_brl": 40.0, "cost_3_brl": 30.0, "retried_after_2": 60, "retryable_fail_2": 100,
+        "approved_3": 30, "attempts_3": 100, "retryable_fail_3": 50,
+        "avg_ticket_eligible_brl": 200.0, "approved_cost_rate": 0.01,
+        "fixed_cost_per_attempt_brl": 0.5,
+    }])
+    r = sc.simulate_s2(base, sc.S2Assumptions(cap=4, delta=0.5)).iloc[0]
+    assert r["d_succeeded"] == pytest.approx(4.5)
+    assert r["d_tpv_brl"] == pytest.approx(900.0)
+    assert r["d_fee_brl"] == pytest.approx(18.0)
+    assert r["d_cost_brl"] == pytest.approx(21.75)
+    assert r["d_net_contribution_brl"] == pytest.approx(18.0 - 21.75)
+    r2 = sc.simulate_s2(base, sc.S2Assumptions(cap=4, delta=0.5, take_mult=1.1, cost_mult=1.2))
+    assert r2.iloc[0]["d_fee_brl"] == pytest.approx(19.8)
+    assert r2.iloc[0]["d_cost_brl"] == pytest.approx(26.1)
+
+
+def test_diagnostic_memo_has_no_run_date_and_is_deterministic(con, dataset_dir, tmp_path):
+    """Audit L1: the same data always renders the same memo (no date.today())."""
+    dg.write_reports(con, dataset_dir, tmp_path / "a")
+    dg.write_reports(con, dataset_dir, tmp_path / "b")
+    a = (tmp_path / "a" / "diagnostic_memo.md").read_text(encoding="utf-8")
+    b = (tmp_path / "b" / "diagnostic_memo.md").read_text(encoding="utf-8")
+    assert a == b
+    assert "Gerado em" not in a and "sem data de execução" in a

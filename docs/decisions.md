@@ -59,3 +59,5 @@
 | 2026-11-21 | P2.5: auditoria independente recalcula do Parquet bruto com pandas (17 checks); tolerância de meio centavo por pagamento | O mart arredonda por pagamento (contrato do P1) |
 | 2026-11-21 | P2.5: dashboard em inglês como P1/P3, tokens neutros; scripts de screenshot/axe reutilizam o helper CDP do P3 | Consistência e sem nova dependência |
 | 2026-11-21 | M7: alegações de "fixado antes do T4" reescritas; docs do P2 alinhados ao código (FX não implementado); axe-core em cópia única `shared/vendor` com `THIRD_PARTY_NOTICES.md` | Auditoria final: história do git não sustentava o pré-registro; licença MPL sem aviso |
+| 2026-11-21 | M7 baixos: check de data de settlement (c14) e defeito injetado; memo do P1 sem data de execução; CDP compartilhado em `shared/browser_cdp.py`; teste de teclado automatizado; `eol=lf`; `sec_per_fit` só no parquet | Fechar os baixos da auditoria que não dependem de publicação |
+| 2026-11-21 | M7 L8: regra de seleção do campeão (EP pareado aproximado) mantida | Alterá-la após ver o holdout seria ajuste pós-hoc |

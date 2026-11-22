@@ -25,7 +25,7 @@ Saída: um Parquet por tabela (metadado de schema `data_origin=synthetic`) e um 
 O **risco latente** é por pagamento e **não é exportado**: funciona como confundidor oculto. Os padrões que a análise "descobre" (diferença entre adquirentes, erro no pico, efeito de faixa de valor) foram **plantados** por esses parâmetros.
 
 ## Fixture corrompida (P1.2.d)
-`corrupt` gera um dataset pequeno e separado (seed + 7, 2.000 pagamentos) e injeta 14 defeitos controlados. O `manifest.json` lista cada defeito, a chave afetada e o check de `sql/checks/contract.sql` que deve pegá-lo.
+`corrupt` gera um dataset pequeno e separado (seed + 7, 2.000 pagamentos) e injeta 15 defeitos controlados. O `manifest.json` lista cada defeito, a chave afetada e o check de `sql/checks/contract.sql` que deve pegá-lo.
 
 ## Execução observada (2026-11-21, seed 20261121)
 | Comando | Resultado |
@@ -33,5 +33,5 @@ O **risco latente** é por pagamento e **não é exportado**: funciona como conf
 | `generate` (padrão) | 447.090 pagamentos, 500.000 tentativas, 360.162 settlements, 300 merchants; 3,5 s |
 | `generate` repetido | `dataset_content_sha256` idêntico (`fa2f4dc4…`) |
 | `generate --attempts 2000000` | 1.788.668 pagamentos, 2.000.000 tentativas; 17,0 s |
-| `check` (limpo) | 13/13 contrato + 5/5 reconciliação PASS |
+| `check` (limpo) | 14/14 contrato + 5/5 reconciliação PASS |
 | `check --contract-only` (corrompido) | 12 checks falham conforme esperado; c13 passa (nenhum defeito o atinge) |
