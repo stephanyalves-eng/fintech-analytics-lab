@@ -4,6 +4,7 @@
     python -m fintech_lab.p2_forecasting.cli check     # checks only (no export)
     python -m fintech_lab.p2_forecasting.cli backtest [--workers 4] [--freeze]  # validation only
     python -m fintech_lab.p2_forecasting.cli holdout   # T4, requires frozen champions
+    python -m fintech_lab.p2_forecasting.cli close     # P2.4 bridges, scenarios, alerts, report
 """
 
 from __future__ import annotations
@@ -19,12 +20,14 @@ import pandas as pd
 
 from fintech_lab.p2_forecasting import budget
 from fintech_lab.p2_forecasting.config import (
+    DEFAULT_ALERTS,
     DEFAULT_ASSUMPTIONS,
     DEFAULT_BACKTEST,
     DEFAULT_BUDGET,
     DEFAULT_CHAMPIONS,
     DEFAULT_OUT,
     DEFAULT_P1_DATA,
+    DEFAULT_SCENARIOS,
     REPORTS,
     d,
     load_assumptions,
@@ -150,6 +153,25 @@ def _holdout(a: argparse.Namespace) -> int:
     return 0
 
 
+def _close(a: argparse.Namespace) -> int:
+    import yaml
+
+    from fintech_lab.p2_forecasting import backtest as bt
+    from fintech_lab.p2_forecasting.closing import run_closing
+
+    load = lambda p: yaml.safe_load(Path(p).read_text(encoding="utf-8"))  # noqa: E731
+    if not Path(a.champions).exists():
+        print("champions not frozen: run `backtest --freeze` and `holdout` first", file=sys.stderr)
+        return 1
+    o = run_closing(a.out, load_assumptions(a.assumptions), bt.load_cfg(a.config),
+                    load(a.scenarios), load(a.alerts), a.champions, REPORTS)
+    print(o["headline"][["metric", "budget", "forecast_composed", "actual", "actual_vs_budget_pct"]]
+          .round(3).to_string(index=False))
+    sev = o["alerts_ex_ante"]["severity"].value_counts().to_dict()
+    print("ex-ante alerts:", sev, "| report -> reports/executive_closing_report.md")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     p = argparse.ArgumentParser(prog="p2")
     p.add_argument("--assumptions", default=str(DEFAULT_ASSUMPTIONS))
@@ -170,6 +192,13 @@ def main(argv: list[str] | None = None) -> int:
         if name == "backtest":
             q.add_argument("--workers", type=int, default=1)
             q.add_argument("--freeze", action="store_true")
+    cl = sub.add_parser("close")
+    cl.add_argument("--config", default=str(DEFAULT_BACKTEST))
+    cl.add_argument("--out", default=str(DEFAULT_OUT))
+    cl.add_argument("--champions", default=str(DEFAULT_CHAMPIONS))
+    cl.add_argument("--scenarios", default=str(DEFAULT_SCENARIOS))
+    cl.add_argument("--alerts", default=str(DEFAULT_ALERTS))
+    cl.set_defaults(fn=_close)
     a = p.parse_args(argv)
     return a.fn(a)
 

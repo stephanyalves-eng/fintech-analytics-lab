@@ -50,3 +50,7 @@
 | 2026-11-21 | P2.3: alvos = TPV/net revenue/margem consolidados + TPV por país (BR, MX, CL) | Decisão do usuário; merchant individual fica fora (intermitência) |
 | 2026-11-21 | P2.3: backtest lê reais truncados em 2025-09-30; campeões congelados em `champions_b1.yaml` (hash de config e dados); holdout T4 roda depois, uma vez, e falha se a config mudou | T4 nunca influencia a escolha |
 | 2026-11-21 | P2.3: baselines com intervalos por resíduos empíricos k-passos (≥ 20 resíduos, senão n/a); ETS/SARIMA com IC do modelo | Cobertura medida, não assumida |
+| 2026-11-21 | P2.4: cenários como premissas relativas sobre 7 drivers (TPV = produto de 3 fatores), separados da banda estatística (erros de soma de 90 d do backtest) | Incerteza estatística ≠ hipóteses de negócio |
+| 2026-11-21 | P2.4: ponte fee = volume + mix (país) + taxa + interação explícita; custos em volume e taxa/mix; falha se houver resíduo | Fecha exatamente com a variação total |
+| 2026-11-21 | P2.4: alertas com limites genéricos em `alerts.yaml`, avaliados ex-ante (≤ as-of) e ex-post | Limites transparentes e editáveis, não calibrados ao T4 |
+| 2026-11-21 | P2.4: achado: premissas de processamento (0,35%) e refund+chargeback (2% da fee) do orçamento v1 estão muito abaixo do observado; v1 segue congelado | Erro não proposital do P2.1; correção só em v2 |

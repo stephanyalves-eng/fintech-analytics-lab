@@ -12,7 +12,7 @@
 | M7 auditoria/publicação | pendente | |
 
 ## Próximo passo
-P2.4 (cenários, desvios e explainability) ou auditoria independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
+P2.5 (dashboard, auditoria e publicação) ou auditoria independente do P3 (M7). Pendências do P1: publicar o repo para o CI rodar (M4) e os Low L1–L6 da auditoria.
 
 ## Log
 - 2026-11-21 M0: estrutura do monorepo, pyproject, ruff, pytest e CI criados.
@@ -35,3 +35,4 @@ P2.4 (cenários, desvios e explainability) ou auditoria independente do P3 (M7).
 - 2026-11-21 P2.1: plano aprovado (cut-off 2025-09-30; orçamento com erro proposital). Criados em `projects/02-tpv-revenue-forecasting/docs/`: problem_statement, metric_contracts (F01–F12, E01–E07, R01–R10), assumptions (refund/chargeback/orçamento v1/cenários) e data_dictionary (anti-leakage). Sem código; todos os valores de premissa são propostas sintéticas ainda não calibradas.
 - 2026-11-21 P2.2: mart diário DuckDB sobre o P1 (`cli build`): merchant (88.199 linhas), segmento, total (365 d), mensal; refund/chargeback sintéticos (5.112/522, seed fixa); calendário; orçamento v1 congelado (jan/2025, +4% a.m.) com hash; splits e features sem vazamento. Checks R01–R10 passam; build repetido ⇒ mesmos hashes. ruff ok; pytest 128 passed. Feriados por regra curada `[TO VERIFY]`; premissas ainda não calibradas.
 - 2026-11-21 P2.3: 6 modelos (naive, snaive, ma7/28, ETS, SARIMA) × 6 alvos, 26 origens semanais, 0 fits falhos (27 s). Validação: SARIMA campeão em 5 alvos (TPV total WAPE 6,2% vs snaive 9,1%); margem fica com ma7 (42%). Holdout T4 (uma vez): todos os modelos subestimam; TPV total campeão −20,8% vs orçamento −34,6%; cobertura 80% = 19,6%. Ver `docs/methods.md`. ruff ok; pytest 138 passed.
+- 2026-11-21 P2.4: `cli close`: pontes Orçamento→Previsão→Realizado (fecham sem resíduo), LMDI Q3→T4, 3 cenários + sensibilidade + banda estatística (separados), 20 alertas ex-ante (8 vermelhos, 2 amarelos) e relatório executivo gerado só com valores calculados. TPV realizado +53,0% vs orçamento; margem −69,8%. Achado: premissas de processamento (0,35% vs ≈1,5% do TPV) e refund+chargeback (2% vs ≈7% da fee) do orçamento v1 estavam descalibradas (erro do P2.1, não declarado); v1 segue congelado. ruff ok; pytest 152 passed.

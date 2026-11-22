@@ -1,0 +1,7 @@
+alert,scope,value,amber,red,severity,evidence
+actual_vs_budget,TPV,0.5295475730085416,0.1,0.2,red,"actual 28,142,909 vs budget 18,399,499"
+actual_vs_budget,Net revenue,0.4165322300494072,0.1,0.2,red,"actual 532,028 vs budget 375,585"
+actual_vs_budget,Contribution margin,-0.6982941011230129,0.1,0.2,red,"actual 88,336 vs budget 292,787"
+take_rate_drift,BR,-0.01111934302960392,0.1,0.2,ok,T4 take 0.0188 vs budget 0.0190
+take_rate_drift,CL,0.030355458387773662,0.1,0.2,ok,T4 take 0.0246 vs budget 0.0239
+take_rate_drift,MX,-0.005979645497233151,0.1,0.2,ok,T4 take 0.0256 vs budget 0.0258

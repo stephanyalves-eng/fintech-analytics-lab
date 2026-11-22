@@ -17,6 +17,8 @@ DEFAULT_BUDGET = P2_ROOT / "configs" / "budget_v1.yaml"
 DEFAULT_P1_DATA = REPO_ROOT / "data" / "p1" / "default"
 DEFAULT_BACKTEST = P2_ROOT / "configs" / "backtest.yaml"
 DEFAULT_CHAMPIONS = P2_ROOT / "configs" / "champions_b1.yaml"
+DEFAULT_SCENARIOS = P2_ROOT / "configs" / "scenarios.yaml"
+DEFAULT_ALERTS = P2_ROOT / "configs" / "alerts.yaml"
 REPORTS = P2_ROOT / "reports"
 DEFAULT_OUT = REPO_ROOT / "data" / "p2"
 

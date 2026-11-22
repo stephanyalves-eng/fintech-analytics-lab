@@ -1,0 +1,21 @@
+alert,scope,value,amber,red,severity,evidence
+forecast_vs_budget,TPV,0.2171437394383163,0.1,0.2,red,"forecast 22,394,835 vs budget 18,399,499"
+forecast_vs_budget,Net revenue,0.15604074923857958,0.1,0.2,amber,"forecast 434,192 vs budget 375,585"
+forecast_vs_budget,Contribution margin,-0.7401859438430005,0.1,0.2,red,"forecast 76,070 vs budget 292,787"
+forecast_vs_budget,TPV BR,0.29709386586767994,0.1,0.2,red,"forecast 14,341,694 vs budget 11,056,790"
+forecast_vs_budget,TPV CL,-0.03485348368706272,0.1,0.2,ok,"forecast 3,496,505 vs budget 3,622,772"
+forecast_vs_budget,TPV MX,0.22492254189381777,0.1,0.2,red,"forecast 4,556,636 vs budget 3,719,938"
+ytd_run_rate_gap,TPV Jan-Sep,0.10505632896197278,0.1,0.2,amber,"actual 47,936,806 vs budget 43,379,513"
+model_reliability,TPV,0.061506,0.15,0.3,ok,"champion sarima, validation composite WAPE"
+interval_coverage_80,TPV,0.8,0.7,0.5,ok,"champion sarima, 90-day backtest coverage"
+model_reliability,Net revenue,0.112275,0.15,0.3,ok,"champion sarima, validation composite WAPE"
+interval_coverage_80,Net revenue,0.9214285714285714,0.7,0.5,ok,"champion sarima, 90-day backtest coverage"
+model_reliability,Contribution margin,0.420104,0.15,0.3,red,"champion ma7, validation composite WAPE"
+interval_coverage_80,Contribution margin,0.7296173044925125,0.7,0.5,ok,"champion ma7, 90-day backtest coverage"
+take_rate_drift,BR,0.016655971679246002,0.1,0.2,ok,last-90d take 0.0193 vs budget 0.0190
+refund_cb_share_drift,BR,2.296943846238534,0.25,0.5,red,last-90d refund+cb/fee 0.0659 vs budget 0.0200
+take_rate_drift,CL,0.023071068325488216,0.1,0.2,ok,last-90d take 0.0245 vs budget 0.0239
+refund_cb_share_drift,CL,2.5787635998295024,0.25,0.5,red,last-90d refund+cb/fee 0.0716 vs budget 0.0200
+take_rate_drift,MX,-0.01471332662081356,0.1,0.2,ok,last-90d take 0.0254 vs budget 0.0258
+refund_cb_share_drift,MX,2.7041375156866088,0.25,0.5,red,last-90d refund+cb/fee 0.0741 vs budget 0.0200
+merchant_concentration,top-10 merchants,0.4287319654847993,0.5,0.7,ok,"share of TPV, last 90 days"

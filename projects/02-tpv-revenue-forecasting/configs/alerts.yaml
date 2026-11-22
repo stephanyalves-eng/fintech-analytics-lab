@@ -1,0 +1,28 @@
+# P2.4 alert thresholds. Generic round numbers set before looking at the T4 outcome; edit freely.
+# Severity: amber when |value| >= amber, red when |value| >= red (for "min" rules: value <= threshold).
+version: a1
+rules:
+  forecast_vs_budget:        # (forecast - budget) / budget, closing quarter, per target
+    amber: 0.10
+    red: 0.20
+  ytd_run_rate_gap:          # (actual YTD at as_of - budget YTD) / budget YTD, TPV
+    amber: 0.10
+    red: 0.20
+  model_reliability:         # composite backtest WAPE of the champion, per target
+    amber: 0.15
+    red: 0.30
+  interval_coverage_80:      # backtest 80% coverage at the 90-day horizon (lower is worse)
+    amber: 0.70
+    red: 0.50
+  take_rate_drift:           # relative gap of last-90-day take rate vs budget take rate, per country
+    amber: 0.10
+    red: 0.20
+  refund_cb_share_drift:     # relative gap of refund+chargeback / fee vs budget share
+    amber: 0.25
+    red: 0.50
+  merchant_concentration:    # share of TPV from the top-10 merchants, last 90 days
+    amber: 0.50
+    red: 0.70
+  actual_vs_budget:          # ex-post: (actual - budget) / budget, closing quarter, per target
+    amber: 0.10
+    red: 0.20
