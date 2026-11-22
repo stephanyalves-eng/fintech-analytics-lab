@@ -94,3 +94,6 @@ O repositório foi publicado e o CI rodou no GitHub Actions (ubuntu, Python 3.12
 | Varredura de vulnerabilidades | `pip-audit` agora roda a cada CI sobre o lock |
 | Teclado humano e leitor de tela | **Não executável pelo assistente.** Roteiro em `docs/manual_accessibility_checklist.md` com tabela de registro vazia |
 | Tema escuro | **Não implementado de propósito** (tokens de design provisórios); condição para reabrir descrita no roteiro manual |
+
+### Verificação no CI (Linux)
+A primeira execução com os passos de navegador falhou em "browser did not start" (Chrome do runner não abriu a porta de depuração dentro de 10 s). O helper passou a esperar até 30 s, usar `--no-sandbox --disable-dev-shm-usage --disable-gpu` quando `CI` está definido e a imprimir o log do navegador ao falhar. A execução seguinte ([44979047835](https://github.com/stephanyalves-eng/fintech-analytics-lab/actions/runs/44979047835)) passou inteira: `pip-audit` sobre o lock, teste de teclado `--strict` nos três dashboards e axe `--strict` em P2 e P3, no ubuntu-latest com Chrome. Isso verifica em Linux os scripts de navegador (parte do L7) e o L9 passa a ser recorrente. Continuam sem teste: macOS e a passagem humana (teclado e leitor de tela).

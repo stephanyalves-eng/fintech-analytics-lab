@@ -11,7 +11,7 @@ Portfolio of three fintech analytics projects built on **synthetic, explicitly l
 > No result is reported unless executed, tested code produced it. All data is synthetic: nothing here is real
 > payment data or real-world performance. Revenue and margin figures are estimates `[TO VERIFY]`.
 > CI (ubuntu, Python 3.12, pinned lock): ruff, `pytest -q`, P1 generate/check/build, P2 pipeline + independent audit with the
-> committed frozen budgets and champions, P3 verify/generate/analyze. Last verified run: [44977708812](https://github.com/stephanyalves-eng/fintech-analytics-lab/actions/runs/44977708812).
+> committed frozen budgets and champions, P3 verify/generate/analyze, `pip-audit` on the lock, keyboard smoke and axe-core against the running dashboards. Last verified run: [44979047835](https://github.com/stephanyalves-eng/fintech-analytics-lab/actions/runs/44979047835).
 > The latest cross-project review is [`docs/audit_m7_final.md`](docs/audit_m7_final.md); current state in [`PROGRESS.md`](PROGRESS.md).
 
 ## Setup (Windows)
