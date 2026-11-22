@@ -46,3 +46,7 @@
 | 2026-11-21 | P2.2: orçamento v1 calibrado só com jan/2025 e congelado em `configs/budget_v1.yaml` com hash; `freeze` recusa sobrescrever | Plano fixo antes de T4 (R10); mudança só como v2 |
 | 2026-11-21 | P2.2: splits treino 01/01–31/07, validação 01/08–30/09 (= as-of), teste T4; lags ≥ horizonte, janelas deslocadas pelo horizonte | Previsão direta sem vazamento; teste de perturbação do futuro |
 | 2026-11-21 | P2.2: feriados por regra curada (fixos, Páscoa, n-ésima segunda), não calendário oficial completo | Sem dependência nova; marcado `[TO VERIFY]` |
+| 2026-11-21 | P2.3: seleção por WAPE composto (média 7/30/90, pesos iguais), por alvo; modelo complexo só vence com margem > 1 EP pareado, senão o melhor baseline | Decisão do usuário (composto) + parcimônia; EP é aproximado |
+| 2026-11-21 | P2.3: alvos = TPV/net revenue/margem consolidados + TPV por país (BR, MX, CL) | Decisão do usuário; merchant individual fica fora (intermitência) |
+| 2026-11-21 | P2.3: backtest lê reais truncados em 2025-09-30; campeões congelados em `champions_b1.yaml` (hash de config e dados); holdout T4 roda depois, uma vez, e falha se a config mudou | T4 nunca influencia a escolha |
+| 2026-11-21 | P2.3: baselines com intervalos por resíduos empíricos k-passos (≥ 20 resíduos, senão n/a); ETS/SARIMA com IC do modelo | Cobertura medida, não assumida |

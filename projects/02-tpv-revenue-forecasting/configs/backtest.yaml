@@ -1,0 +1,27 @@
+# P2.3 backtest protocol. Fixed BEFORE running; the T4 holdout is touched once, after the champion is frozen.
+version: b1
+as_of: "2025-09-30"            # backtest actuals are truncated here: nothing after it is ever loaded
+horizons: [7, 30, 90]          # evaluation windows (days ahead); only full windows inside as_of count
+max_horizon: 92                # forecast path length (T4 = 92 days)
+origins:
+  first: "2025-04-01"          # >= 91 days of history (13 weekly cycles)
+  step_days: 7
+  last: "2025-09-23"           # last origin with a full 7-day window before as_of
+targets:
+  totals: [tpv_total, net_revenue_total, contribution_total]
+  tpv_by_country: [BR, MX, CL]
+models: [naive, snaive, ma7, ma28, ets, sarima]
+baselines: [naive, snaive, ma7, ma28]
+ets: {error: add, trend: add, damped_trend: true, seasonal: add, seasonal_periods: 7}
+sarima:
+  seasonal_order: [0, 1, 1, 7]
+  order_grid: [[1, 1, 1], [0, 1, 1], [2, 1, 0]]     # chosen per fit by AIC on data <= origin
+intervals:
+  levels: [0.80, 0.95]
+  min_residuals_baseline: 20   # empirical-residual intervals need at least this many in-sample errors
+selection:
+  # composite = mean of pooled daily WAPE at horizons 7, 30 and 90 (equal weights), validation only.
+  # A complex model (ets/sarima) becomes champion only if it beats the best baseline by more than
+  # one paired standard error (parsimony); otherwise the best baseline wins.
+  complex: [ets, sarima]
+  se_multiplier: 1.0

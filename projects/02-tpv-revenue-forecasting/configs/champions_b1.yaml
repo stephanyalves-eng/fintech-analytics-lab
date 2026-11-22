@@ -1,0 +1,30 @@
+backtest_version: b1
+config_hash: 23d5a37a87ccab04259480c3cec21483068346d1c39aa7fb1091672bdda3d11a
+data_hash: 2ddf73a17688ca98ccd107c581d89620b73d93e4fe098db17ae98c8c93e8431d
+selection_rule: composite WAPE (7/30/90), validation only; parsimony vs best baseline
+created_at: '2026-11-22T01:06:49+00:00'
+champions:
+  contribution_total:
+    model: ma7
+    reason: best baseline
+    composite_wape: 0.420104
+  net_revenue_total:
+    model: sarima
+    reason: beats best baseline by more than 1 paired SE
+    composite_wape: 0.112275
+  tpv_BR:
+    model: sarima
+    reason: beats best baseline by more than 1 paired SE
+    composite_wape: 0.08251
+  tpv_CL:
+    model: sarima
+    reason: beats best baseline by more than 1 paired SE
+    composite_wape: 0.152028
+  tpv_MX:
+    model: sarima
+    reason: beats best baseline by more than 1 paired SE
+    composite_wape: 0.134024
+  tpv_total:
+    model: sarima
+    reason: beats best baseline by more than 1 paired SE
+    composite_wape: 0.061506
